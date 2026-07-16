@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFC Tag Suite</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f9fafb;
+            --card-bg: #ffffff;
+            --text-main: #111827;
+            --text-muted: #4b5563;
+            --border: #e5e7eb;
+            --warning-bg: #fffbeb;
+            --warning-border: #f59e0b;
+            --warning-text: #b45309;
+            --success: #059669;
+            --success-hover: #047857;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .icon {
+            font-size: 50px;
+            margin-bottom: 5px;
+        }
+
+        .secret-trigger {
+            width: 40px;
+            height: 8px;
+            background: transparent;
+            margin: 0 auto 15px auto;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .secret-trigger:active {
+            background: rgba(79, 70, 229, 0.1);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 0 0 8px 0;
+            color: var(--text-main);
+        }
+
+        p {
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0 0 24px 0;
+        }
+
+        .tab-container {
+            display: flex;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .input-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+            box-sizing: border-box;
+            transition: all 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            outline: none;
+        }
+
+        /* Sub-navigation inside Maps */
+        .sub-tab-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .sub-tab {
+            flex: 1;
+            padding: 8px;
+            background: #f3f4f6;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .sub-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Preview Code Panel */
+        .preview-box {
+            background: #f3f4f6;
+            border: 1px dashed #cbd5e1;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: left;
+            word-break: break-all;
+        }
+
+        .preview-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .preview-code {
+            font-family: monospace;
+            font-size: 13px;
+            color: #0f172a;
+            background: #e2e8f0;
+            padding: 6px 10px;
+            border-radius: 6px;
+            display: block;
+            margin-top: 5px;
+        }
+
+        /* Warnings Panel */
+        .warning-box {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            color: var(--warning-text);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: left;
+            display: none;
+        }
+
+        .warning-box h4 {
+            margin: 0 0 8px 0;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .warning-box ol {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        /* Socials Row Layout */
+        .socials-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 15px;
+        }
+
+        .social-card {
+            background: #f9fafb;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .social-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .social-name {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text-main);
+        }
+
+        .social-input-wrapper {
+            margin-bottom: 12px;
+        }
+
+        .social-input-wrapper label {
+            font-size: 10px;
+            font-weight: bold;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .social-input-wrapper input {
+            padding: 8px 12px;
+            font-size: 13px;
+            border-radius: 6px;
+            border-width: 1px;
+        }
+
+        .social-url {
+            font-family: monospace;
+            font-size: 11px;
+            color: var(--text-muted);
+            word-break: break-all;
+            margin-bottom: 12px;
+            display: block;
+            background: #f3f4f6;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .social-write-btn {
+            background-color: var(--success);
+            padding: 10px 14px;
+            font-size: 13px;
+            font-weight: bold;
+            border-radius: 8px;
+            width: 100%;
+            display: block;
+        }
+
+        .social-write-btn:hover {
+            background-color: var(--success-hover);
+        }
+
+        /* Global Button */
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 20px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        button:disabled {
+            background-color: #e5e7eb;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 12px;
+            border-radius: 10px;
+            display: none;
+            line-height: 1.4;
+        }
+
+        .status-loading { display: block !important; background: #eff6ff; color: #1e40af; }
+        .status-success { display: block !important; background: #ecfdf5; color: #065f46; }
+        .status-error { display: block !important; background: #fef2f2; color: #991b1b; }
+
+        gmp-map {
+            display: none !important;
+        }
+    </style>
+
+    <!-- Google Maps JS API Loader -->
+    <script>
+        (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
+            key: "AIzaSyA6myHzS10YXdcazAFalmXvDkrYCp5cLc8"
+        });
+    </script>
+</head>
+<body>
+
+<div class="card">
+    <div class="icon">🔮</div>
+    <div class="secret-trigger" id="secretBtn"></div>
+    
+    <h1>NFC Setup Suite</h1>
+    <p>Program Google Reviews or your social profiles directly onto physical NFC tags.</p>
+
+    <!-- Top Navigation Tabs (Maps vs Socials) -->
+    <div class="tab-container">
+        <div id="tab-maps-group" class="tab active" onclick="switchMainTab('maps')">📍 Google Maps</div>
+        <div id="tab-socials-group" class="tab" onclick="switchMainTab('socials')">📱 Social Links</div>
+    </div>
+    
+    <!-- SECTION 1: GOOGLE MAPS CONTROLS -->
+    <div id="section-maps">
+        <div class="sub-tab-container">
+            <div id="sub-tab-search" class="sub-tab active" onclick="switchMapsSubTab('search')">Search Name</div>
+            <div id="sub-tab-link" class="sub-tab" onclick="switchMapsSubTab('link')">Paste Link</div>
+        </div>
+
+        <div id="container-search" class="input-group">
+            <label for="autocomplete">Search Google Business</label>
+            <input type="text" id="autocomplete" placeholder="Type business name..." autocomplete="off">
+        </div>
+
+        <div id="container-link" class="input-group" style="display: none;">
+            <label for="mapsUrl">Paste Google Maps Link</label>
+            <input type="text" id="mapsUrl" placeholder="Paste full Google Maps address bar URL..." autocomplete="off">
+        </div>
+
+        <div id="warningBox" class="warning-box">
+            <h4>⚠️ Short Link Detected!</h4>
+            <p style="color: inherit; font-size: 12px; margin-bottom: 10px;">Google short links do not contain the needed Place details. Please get the full URL using these steps:</p>
+            <ol>
+                <li>Open the short link in any web browser.</li>
+                <li>Let the page load fully until you see the map and the search sidebar.</li>
+                <li>Go to the browser's address bar at the top, select and copy the complete, long URL.</li>
+                <li>Paste that expanded long URL into the box above.</li>
+            </ol>
+        </div>
+
+        <button id="actionBtn" disabled style="margin-bottom: 20px;">1. Choose a Business First</button>
+    </div>
+
+    <!-- SECTION 2: SOCIALS CONTROLS (With 7 Individual Inputs) -->
+    <div id="section-socials" style="display: none;">
+        <div class="socials-list" id="socialsContainer">
+            
+            <!-- YouTube (Auto-Subscribe) -->
+            <div class="social-card">
+                <div class="social-header">
+                    <span class="social-name">📺 YouTube (Auto-Subscribe)</span>
+                </div>
+                <div class="social-input-wrapper">
+                    <label for="input-youtube">YouTube Username/Channel</label>
+                    <input type="text" id="input-youtube" placeholder="e.g., graceautomation" oninput="updateSocialUrl('youtube')">
+                </div>
+                <span class="social-url" id="url-youtube">https://www.youtube.com/</span>
+                <button class="social-write-btn" onclick="triggerSocialWrite('youtube')">⚡ Write YouTube Tag</button>
+            </div>
+
+            <!-- X / Twitter (Auto-Follow) -->
+            <div class="social-card">
+                <div class="social-header">
+                    <span class="social-name">🐦 X / Twitter (Auto-Follow)</span>
+                </div>
+                <div class="social-input-wrapper">
+                    <label for="input-twitter">X / Twitter Handle</label>
+                    <input type="text" id="input-twitter" placeholder="e.g., graceautomation" oninput="updateSocialUrl('twitter')">
+                </div>
+                <span class="social-url" id="url-twitter">https://twitter.com/</span>
+                <button class="social-write-btn" onclick="triggerSocialWrite('twitter')">⚡ Write X / Twitter Tag</button>
+            </div>
+
+            <!-- Facebook -->
+            <div class="social-card">
+                <div class="social-header">
+                    <span class="social-name">👥 Facebook</span>
+                </div>
+                <div class="social-input-wrapper">
+                    <label for="input-facebook">Facebook Profile/Page Name</label>
+                    <input type="text" id="input-facebook" placeholder="e.g., graceautomation" oninput="updateSocialUrl('facebook')">
+                </div>
+                <span class="social-url" id="url-facebook">https://www.facebook.com/</span>
+                <button class="social-write-btn" onclick="triggerSocialWrite('facebook')">⚡ Write Facebook Tag</button>
+            </div>
+
+            <!-- TikTok -->
+            <div class="social-card">
+                <div class="social-header">
+                    <span class="social-name">🎵 TikTok</span>
+                </div>
+                <div class="social-input-wrapper">
+                    <label for="input-tiktok">TikTok Username</label>
+                    <input type="text" id="input-tiktok" placeholder="e.g., graceautomation" oninput="updateSocialUrl('tiktok')">
+                </div>
+                <span class="social-url" id="url-tiktok">https://www.tiktok.com/</span>
+                <button class="social-write-btn" onclick="triggerSocialWrite('tiktok')">⚡ Write TikTok Tag</button>
+            </div>
+
+            <!-- Instagram -->
+            <div class="social-card">
+                <div class="social-header">
+                    <span class="social-name">📸 Instagram</span>
+                </div>
+                <div class="social-input-wrapper">
+                    <label for="input-instagram">Instagram Username</label>
+                    <input type="text" id="input-instagram" placeholder="e.g., graceautomation" oninput="updateSocialUrl('instagram')">
+                </div>
+                <span class="social-url" id="url-instagram">https://www.instagram.com/</span>
+                <button class="social-write-btn" onclick="triggerSocialWrite('instagram')">⚡ Write Instagram Tag</button>
+            </div>
+
+            <!-- LinkedIn -->
+            <div class="social-card">
+                <div class="social-header">
+                    <span class="social-name">💼 LinkedIn (Company Page)</span>
+                </div>
+                <div class="social-input-wrapper">
+                    <label for="input-linkedin">LinkedIn Company ID/Slug</label>
+                    <input type="text" id="input-linkedin" placeholder="e.g., graceautomation" oninput="updateSocialUrl('linkedin')">
+                </div>
+                <span class="social-url" id="url-linkedin">https://www.linkedin.com/</span>
+                <button class="social-write-btn" onclick="triggerSocialWrite('linkedin')">⚡ Write LinkedIn Tag</button>
+            </div>
+
+            <!-- Twitch -->
+            <div class="social-card">
+                <div class="social-header">
+                    <span class="social-name">🎮 Twitch</span>
+                </div>
+                <div class="social-input-wrapper">
+                    <label for="input-twitch">Twitch Channel Name</label>
+                    <input type="text" id="input-twitch" placeholder="e.g., graceautomation" oninput="updateSocialUrl('twitch')">
+                </div>
+                <span class="social-url" id="url-twitch">https://www.twitch.tv/</span>
+                <button class="social-write-btn" onclick="triggerSocialWrite('twitch')">⚡ Write Twitch Tag</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Preview Display Panel (Hidden by default, controlled by secret button) -->
+    <div class="preview-box" id="previewBox">
+        <div class="preview-title">📡 Code to be programmed on tag:</div>
+        <span id="previewDisplay" class="preview-code">Waiting for business selection...</span>
+    </div>
+    
+    <div id="status"></div>
+</div>
+
+<gmp-map center="-33.8688, 151.2195" zoom="13" map-id="DEMO_MAP_ID">
+    <gmp-place-autocomplete id="google-auto-component" slot="control-inline-start-block-start"></gmp-place-autocomplete>
+</gmp-map>
+
+<script>
+    // Hidden Preview Switch (Default disabled)
+    let SHOW_PREVIEW_BOX = false; 
+
+    let activeMainTab = 'maps';
+    let mapsSubTab = 'search';
+    let targetReviewUrl = '';
+    let isReadyToWrite = false;
+
+    // Element Selectors
+    const autocompleteInput = document.getElementById('autocomplete');
+    const mapsUrlInput = document.getElementById('mapsUrl');
+    const previewBox = document.getElementById('previewBox');
+    const previewDisplay = document.getElementById('previewDisplay');
+    const warningBox = document.getElementById('warningBox');
+    const actionBtn = document.getElementById('actionBtn');
+    const statusDiv = document.getElementById('status');
+    const secretBtn = document.getElementById('secretBtn');
+
+    // Initial Hide of preview panel
+    previewBox.style.display = SHOW_PREVIEW_BOX ? 'block' : 'none';
+
+    // ==========================================
+    // 🕵️‍♂️ HIDDEN LONG PRESS CONTROLLER (4-Second Hold)
+    // ==========================================
+    let holdTimer;
+    const holdDuration = 4000;
+
+    function startPress(e) {
+        e.preventDefault();
+        holdTimer = setTimeout(() => {
+            SHOW_PREVIEW_BOX = !SHOW_PREVIEW_BOX;
+            previewBox.style.display = SHOW_PREVIEW_BOX ? 'block' : 'none';
+            alert(`Preview Panel is now: ${SHOW_PREVIEW_BOX ? 'ENABLED' : 'DISABLED'}`);
+        }, holdDuration);
+    }
+
+    function endPress() {
+        clearTimeout(holdTimer);
+    }
+
+    secretBtn.addEventListener('mousedown', startPress);
+    secretBtn.addEventListener('mouseup', endPress);
+    secretBtn.addEventListener('mouseleave', endPress);
+    secretBtn.addEventListener('touchstart', startPress, { passive: false });
+    secretBtn.addEventListener('touchend', endPress);
+    secretBtn.addEventListener('touchcancel', endPress);
+
+    // ==========================================
+    // 🔀 NAVIGATION TABS (Main & Sub-Tabs)
+    // ==========================================
+    function switchMainTab(tabName) {
+        activeMainTab = tabName;
+        document.getElementById('tab-maps-group').classList.toggle('active', tabName === 'maps');
+        document.getElementById('tab-socials-group').classList.toggle('active', tabName === 'socials');
+        
+        document.getElementById('section-maps').style.display = tabName === 'maps' ? 'block' : 'none';
+        document.getElementById('section-socials').style.display = tabName === 'socials' ? 'block' : 'none';
+        
+        statusDiv.style.display = 'none';
+    }
+
+    function switchMapsSubTab(subTabName) {
+        mapsSubTab = subTabName;
+        document.getElementById('sub-tab-search').classList.toggle('active', subTabName === 'search');
+        document.getElementById('sub-tab-link').classList.toggle('active', subTabName === 'link');
+        
+        document.getElementById('container-search').style.display = subTabName === 'search' ? 'block' : 'none';
+        document.getElementById('container-link').style.display = subTabName === 'link' ? 'block' : 'none';
+        
+        resetMapsAppState();
+    }
+
+    function resetMapsAppState() {
+        targetReviewUrl = '';
+        isReadyToWrite = false;
+        previewDisplay.innerText = "Waiting for input...";
+        actionBtn.innerText = mapsSubTab === 'search' ? "1. Select Business First" : "1. Process Link";
+        actionBtn.disabled = mapsSubTab === 'search';
+        actionBtn.style.backgroundColor = '';
+        statusDiv.style.display = 'none';
+        warningBox.style.display = 'none';
+    }
+
+    // ==========================================
+    // 📍 GOOGLE MAPS AUTOMATION
+    // ==========================================
+    async function initGoogleLibrary() {
+        const { Place } = await google.maps.importLibrary("places");
+        
+        const autocomplete = new google.maps.places.Autocomplete(autocompleteInput, {
+            types: ['establishment'],
+            fields: ['place_id', 'name']
+        });
+
+        autocomplete.addListener('place_changed', () => {
+            const place = autocomplete.getPlace();
+            if (!place.place_id) {
+                showStatus("Please select a business from the autocomplete dropdown list.", "error");
+                return;
+            }
+
+            targetReviewUrl = `https://search.google.com/local/writereview?placeid=${place.place_id}`;
+            setReadyToWriteState(`Selected: "${place.name}"`);
+        });
+    }
+
+    window.onload = () => {
+        setTimeout(() => {
+            if (window.google && window.google.maps) {
+                initGoogleLibrary();
+            } else {
+                console.error("Google Maps Script failed to mount onto window.");
+            }
+        }, 1000);
+    };
+
+    mapsUrlInput.addEventListener('input', () => {
+        const rawUrl = mapsUrlInput.value.trim();
+        
+        const isShortLink = rawUrl.includes("goo.gl") || 
+                            rawUrl.includes("g.page") || 
+                            rawUrl.includes("app.goo.gl") || 
+                            rawUrl.includes("googleusercontent.com");
+
+        if (isShortLink) {
+            warningBox.style.display = 'block';
+            showStatus("⚠️ Short links cannot be parsed directly.", "error");
+            actionBtn.disabled = true;
+            isReadyToWrite = false;
+            return;
+        }
+
+        warningBox.style.display = 'none';
+        resetMapsAppState();
+        if (rawUrl !== '') {
+            actionBtn.disabled = false;
+        }
+    });
+
+    async function handleLinkProcess() {
+        const rawUrl = mapsUrlInput.value.trim();
+        if (!rawUrl) {
+            showStatus("Please paste a valid Google Maps link first.", "error");
+            return;
+        }
+
+        showStatus("🔍 Processing URL...", "loading");
+
+        try {
+            const decodedUrl = decodeURIComponent(rawUrl);
+
+            const chijMatch = decodedUrl.match(/(ChIJ[a-zA-Z0-9_-]{23})/);
+            const hexMatch = decodedUrl.match(/!1s(0x[0-9a-fA-F]+:0x[0-9a-fA-F]+)/);
+
+            if (chijMatch) {
+                targetReviewUrl = `https://search.google.com/local/writereview?placeid=${chijMatch[1]}`;
+                setReadyToWriteState("Link parsed successfully!");
+            } else if (hexMatch) {
+                targetReviewUrl = `https://search.google.com/local/writereview?fid=${hexMatch[1]}`;
+                setReadyToWriteState("Link parsed successfully!");
+            } else {
+                throw new Error("Could not find a Place ID inside this link. Verify you copied the correct business link.");
+            }
+
+        } catch (error) {
+            showStatus(`❌ ${error.message}`, "error");
+            resetAppState();
+            if (mapsSubTab === 'link') actionBtn.disabled = false;
+        }
+    }
+
+    function setReadyToWriteState(successMsg) {
+        isReadyToWrite = true;
+        previewDisplay.innerText = targetReviewUrl;
+        actionBtn.innerText = "⚡ Write to NFC Tag";
+        actionBtn.style.backgroundColor = "#059669";
+        actionBtn.disabled = false;
+        showStatus(`✅ ${successMsg}. Ready to write!`, "success");
+    }
+
+    actionBtn.addEventListener('click', async () => {
+        if (!isReadyToWrite && mapsSubTab === 'link') {
+            await handleLinkProcess();
+        } else if (isReadyToWrite) {
+            await writeNfcTag(targetReviewUrl);
+        }
+    });
+
+    // ==========================================
+    // 📱 SOCIALS INDIVIDUAL PARSING
+    // ==========================================
+    const socialPatterns = {
+        youtube: (usr) => `https://www.youtube.com/@${usr}?sub_confirmation=1`,
+        twitter: (usr) => `https://twitter.com/intent/user?screen_name=${usr}`,
+        facebook: (usr) => `https://www.facebook.com/${usr}`,
+        tiktok: (usr) => `https://www.tiktok.com/@${usr}`,
+        instagram: (usr) => `https://www.instagram.com/${usr}/`,
+        linkedin: (usr) => `https://www.linkedin.com/company/${usr}/`,
+        twitch: (usr) => `https://www.twitch.tv/${usr}`
+    };
+
+    // Reactively update only the specific platform URL when its input changes
+    function updateSocialUrl(platform) {
+        const inputEl = document.getElementById(`input-${platform}`);
+        const displayEl = document.getElementById(`url-${platform}`);
+        const username = inputEl.value.trim();
+
+        if (username) {
+            displayEl.innerText = socialPatterns[platform](username);
+        } else {
+            // Reset to clean fallback URL structure if input is cleared
+            displayEl.innerText = socialPatterns[platform]('username').replace('username', '').replace('@', '');
+        }
+    }
+
+    // Write execution for individual social buttons
+    async function triggerSocialWrite(platform) {
+        const inputEl = document.getElementById(`input-${platform}`);
+        const username = inputEl.value.trim();
+        
+        if (!username) {
+            showStatus(`⚠️ Please enter a profile username for ${platform.toUpperCase()} first.`, "error");
+            return;
+        }
+
+        const generatedUrl = socialPatterns[platform](username);
+        previewDisplay.innerText = generatedUrl;
+        
+        await writeNfcTag(generatedUrl);
+    }
+
+    // ==========================================
+    // ⚡ COMMON WEBNFC EXECUTION ENGINE
+    // ==========================================
+    async function writeNfcTag(writeUrl) {
+        if (!('NDEFReader' in window)) {
+            showStatus("❌ NFC programming is only supported using Google Chrome on Android.", "error");
+            return;
+        }
+
+        try {
+            showStatus(`⌛ TAP TAG: Hold tag against your phone to program: ${writeUrl}`, "loading");
+            if (activeMainTab === 'maps') actionBtn.disabled = true;
+
+            const ndef = new NDEFReader();
+            await ndef.write({
+                records: [{ recordType: "url", data: writeUrl }]
+            });
+
+            showStatus("🎉 SUCCESS! Your NFC Tag has been permanently programmed.", "success");
+            if (activeMainTab === 'maps') actionBtn.disabled = false;
+        } catch (error) {
+            showStatus(`❌ NFC Write Failed: ${error.message}. Please tap again.`, "error");
+            if (activeMainTab === 'maps') actionBtn.disabled = false;
+        }
+    }
+
+    function showStatus(message, type) {
+        statusDiv.className = '';
+        statusDiv.innerText = message;
+        if (type === 'loading') statusDiv.classList.add('status-loading');
+        if (type === 'success') statusDiv.classList.add('status-success');
+        if (type === 'error') statusDiv.classList.add('status-error');
+    }
+</script>
+
+</body>
+</html>
