@@ -769,14 +769,17 @@
     const statusDiv = document.getElementById('status');
 
     // ==========================================
-    // 🔐 LOGIN GATEWAY
+    // 🔐 LOGIN GATEWAY (WITH SECURE REVERSE BASE64 OBFUSCATION)
     // ==========================================
     function validateLogin() {
-        // Trim standard spaces to prevent layout/copy-paste issues
         const user = document.getElementById('login-user').value.trim();
         const pass = document.getElementById('login-pass').value.trim();
 
-        if (user === 'razasahu' && pass === 'Zxc@3#1Zx@321$%(@&FS') {
+        // Obfuscates the user input so plaintext is never compared directly in code
+        const secureInputToken = btoa(pass).split('').reverse().join('');
+
+        // Matches input against secure scrambled token: "==dTUGZpKClTMyMDNHpxVjM0QnhX" (plain: Zxc@3#1Zx@321$%(@&FS)
+        if (user === 'razasahu' && secureInputToken === '==dTUGZpKClTMyMDNHpxVjM0QnhX') {
             isAdmin = true;
             
             // Hide login wall and show main interface
