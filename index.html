@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NFC Tag Suite</title>
+    <title>NFC Tag Suite Pro</title>
     <style>
         :root {
             --primary: #4f46e5;
             --primary-hover: #4338ca;
-            --bg: #f9fafb;
+            --bg: #f3f4f6;
             --card-bg: #ffffff;
             --text-main: #111827;
             --text-muted: #4b5563;
@@ -18,6 +18,7 @@
             --warning-text: #b45309;
             --success: #059669;
             --success-hover: #047857;
+            --danger: #dc2626;
         }
 
         body {
@@ -37,723 +38,1156 @@
 
         .card {
             background: var(--card-bg);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
-            max-width: 480px;
+            padding: 24px;
+            border-radius: 24px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.05);
+            max-width: 520px;
             width: 100%;
             text-align: center;
             border: 1px solid var(--border);
+            box-sizing: border-box;
         }
 
-        .icon {
-            font-size: 50px;
-            margin-bottom: 5px;
+        .header {
+            margin-bottom: 20px;
+            position: relative;
         }
 
-        .secret-trigger {
-            width: 40px;
-            height: 8px;
-            background: transparent;
-            margin: 0 auto 15px auto;
-            border-radius: 4px;
+        .back-btn {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #f3f4f6;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: background 0.2s;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s;
         }
 
-        .secret-trigger:active {
-            background: rgba(79, 70, 229, 0.1);
-        }
-
-        h1 {
-            font-size: 24px;
-            margin: 0 0 8px 0;
+        .back-btn:hover {
+            background: #e5e7eb;
             color: var(--text-main);
         }
 
-        p {
-            color: var(--text-muted);
-            font-size: 14px;
-            line-height: 1.5;
-            margin: 0 0 24px 0;
+        .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
         }
 
-        .tab-container {
+        h1 {
+            font-size: 22px;
+            margin: 0 0 4px 0;
+            color: var(--text-main);
+        }
+
+        .user-status-bar {
             display: flex;
-            border-bottom: 2px solid var(--border);
+            justify-content: space-between;
+            align-items: center;
+            background: #f3f4f6;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
             margin-bottom: 20px;
         }
 
-        .tab {
-            flex: 1;
-            padding: 10px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 14px;
-            color: var(--text-muted);
-            border-bottom: 2px solid transparent;
-            margin-bottom: -2px;
+        /* SCREEN 1: Grid Menu (2 columns, 7 rows layout to fit 14 cleanly) */
+        .grid-menu {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 10px;
         }
 
-        .tab.active {
+        .grid-item {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .grid-item:hover {
+            border-color: var(--primary);
+            background: #fefeff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.08);
+        }
+
+        .grid-item .item-icon {
+            font-size: 24px;
+        }
+
+        .grid-item .item-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        /* SCREEN 2: Workspaces */
+        .workspace {
+            display: none;
+            text-align: left;
+        }
+
+        .workspace-header {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
             color: var(--primary);
-            border-bottom-color: var(--primary);
+            border-bottom: 2px solid #f3f4f6;
+            padding-bottom: 8px;
         }
 
         .input-group {
             text-align: left;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         label {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 700;
             color: var(--text-muted);
             text-transform: uppercase;
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             letter-spacing: 0.5px;
         }
 
-        input {
+        input, select, textarea {
             width: 100%;
-            padding: 14px 16px;
+            padding: 12px 14px;
             border: 2px solid var(--border);
             border-radius: 10px;
-            font-size: 15px;
+            font-size: 14px;
             box-sizing: border-box;
             transition: all 0.2s;
+            background-color: #fff;
+            font-family: inherit;
         }
 
-        input:focus {
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        input:focus, select:focus, textarea:focus {
             border-color: var(--primary);
             box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
             outline: none;
         }
 
-        /* Sub-navigation inside Maps */
-        .sub-tab-container {
-            display: flex;
+        .row-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
+        }
+
+        .instruction-box {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            color: var(--warning-text);
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .instruction-box h4 {
+            margin: 0 0 6px 0;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .instruction-box ol, .instruction-box ul {
+            margin: 0;
+            padding-left: 16px;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        /* Scan Window Box */
+        .scanner-container {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+            background: #000;
+            padding: 10px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        #qr-reader {
+            width: 100%;
+            border: none !important;
+        }
+
+        .scan-trigger-btn {
+            background-color: #4b5563;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
             margin-bottom: 15px;
         }
 
-        .sub-tab {
-            flex: 1;
-            padding: 8px;
-            background: #f3f4f6;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            color: var(--text-muted);
-            text-align: center;
-        }
-
-        .sub-tab.active {
-            background: var(--primary);
-            color: white;
-        }
-
-        /* Preview Code Panel */
         .preview-box {
             background: #f3f4f6;
             border: 1px dashed #cbd5e1;
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
-            margin-bottom: 20px;
+            margin-top: 15px;
             text-align: left;
             word-break: break-all;
+            display: none;
         }
 
         .preview-title {
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
             font-weight: bold;
             color: var(--text-muted);
-            margin-bottom: 6px;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-badge {
+            font-size: 8px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #e0e7ff;
+            color: #4f46e5;
+            font-weight: bold;
+        }
+
+        .admin-badge.active {
+            background: #d1fae5;
+            color: #065f46;
         }
 
         .preview-code {
             font-family: monospace;
-            font-size: 13px;
+            font-size: 12px;
             color: #0f172a;
             background: #e2e8f0;
             padding: 6px 10px;
             border-radius: 6px;
             display: block;
-            margin-top: 5px;
+            margin-top: 4px;
+            white-space: pre-wrap;
         }
 
-        /* Warnings Panel */
-        .warning-box {
-            background: var(--warning-bg);
-            border: 1px solid var(--warning-border);
-            color: var(--warning-text);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: left;
-            display: none;
-        }
-
-        .warning-box h4 {
-            margin: 0 0 8px 0;
-            font-size: 13px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .warning-box ol {
-            margin: 0;
-            padding-left: 18px;
-            font-size: 12px;
-            line-height: 1.5;
-        }
-
-        /* Socials Row Layout */
-        .socials-list {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            margin-top: 15px;
-        }
-
-        .social-card {
+        .suite-card {
             background: #f9fafb;
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 15px;
             text-align: left;
+            margin-bottom: 15px;
         }
 
-        .social-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .social-name {
-            font-weight: 700;
-            font-size: 14px;
-            color: var(--text-main);
-        }
-
-        .social-input-wrapper {
-            margin-bottom: 12px;
-        }
-
-        .social-input-wrapper label {
-            font-size: 10px;
-            font-weight: bold;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 4px;
-            display: block;
-        }
-
-        .social-input-wrapper input {
-            padding: 8px 12px;
-            font-size: 13px;
-            border-radius: 6px;
-            border-width: 1px;
-        }
-
-        .social-url {
-            font-family: monospace;
-            font-size: 11px;
-            color: var(--text-muted);
-            word-break: break-all;
-            margin-bottom: 12px;
-            display: block;
-            background: #f3f4f6;
-            padding: 6px 10px;
-            border-radius: 6px;
-            border: 1px solid var(--border);
-        }
-
-        .social-write-btn {
-            background-color: var(--success);
-            padding: 10px 14px;
-            font-size: 13px;
-            font-weight: bold;
-            border-radius: 8px;
-            width: 100%;
-            display: block;
-        }
-
-        .social-write-btn:hover {
-            background-color: var(--success-hover);
-        }
-
-        /* Global Button */
-        button {
+        button.primary-action-btn {
             background-color: var(--primary);
             color: white;
             border: none;
-            padding: 16px 20px;
+            padding: 14px 18px;
             width: 100%;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
 
-        button:hover {
+        button.primary-action-btn:hover {
             background-color: var(--primary-hover);
         }
 
-        button:disabled {
-            background-color: #e5e7eb;
-            color: #9ca3af;
-            cursor: not-allowed;
-        }
+        .btn-loading { background-color: #2563eb !important; color: white !important; cursor: not-allowed; }
+        .btn-success { background-color: #059669 !important; color: white !important; }
+        .btn-error { background-color: #dc2626 !important; color: white !important; }
 
         #status {
-            margin-top: 20px;
-            font-size: 14px;
+            margin-top: 15px;
+            font-size: 13px;
             font-weight: 500;
-            padding: 12px;
-            border-radius: 10px;
+            padding: 10px;
+            border-radius: 8px;
             display: none;
             line-height: 1.4;
+            text-align: left;
         }
 
         .status-loading { display: block !important; background: #eff6ff; color: #1e40af; }
         .status-success { display: block !important; background: #ecfdf5; color: #065f46; }
         .status-error { display: block !important; background: #fef2f2; color: #991b1b; }
-
-        gmp-map {
-            display: none !important;
-        }
     </style>
-
-    <!-- Google Maps JS API Loader -->
-    <script>
-        (g=>{var h,a,k,p="The Google Maps JavaScript API",c="google",l="importLibrary",q="__ib__",m=document,b=window;b=b[c]||(b[c]={});var d=b.maps||(b.maps={}),r=new Set,e=new URLSearchParams,u=()=>h||(h=new Promise(async(f,n)=>{await (a=m.createElement("script"));e.set("libraries",[...r]+"");for(k in g)e.set(k.replace(/[A-Z]/g,t=>"_"+t[0].toLowerCase()),g[k]);e.set("callback",c+".maps."+q);a.src=`https://maps.${c}apis.com/maps/api/js?`+e;d[q]=f;a.onerror=()=>h=n(Error(p+" could not load."));a.nonce=m.querySelector("script[nonce]")?.nonce||"";m.head.append(a)}));d[l]?console.warn(p+" only loads once. Ignoring:",g):d[l]=(f,...n)=>r.add(f)&&u().then(()=>d[l](f,...n))})({
-            key: "AIzaSyA6myHzS10YXdcazAFalmXvDkrYCp5cLc8"
-        });
-    </script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
 </head>
 <body>
 
 <div class="card">
-    <div class="icon">🔮</div>
-    <div class="secret-trigger" id="secretBtn"></div>
-    
-    <h1>NFC Setup Suite</h1>
-    <p>Program Google Reviews or your social profiles directly onto physical NFC tags.</p>
-
-    <!-- Top Navigation Tabs (Maps vs Socials) -->
-    <div class="tab-container">
-        <div id="tab-maps-group" class="tab active" onclick="switchMainTab('maps')">📍 Google Maps</div>
-        <div id="tab-socials-group" class="tab" onclick="switchMainTab('socials')">📱 Social Links</div>
-    </div>
-    
-    <!-- SECTION 1: GOOGLE MAPS CONTROLS -->
-    <div id="section-maps">
-        <div class="sub-tab-container">
-            <div id="sub-tab-search" class="sub-tab active" onclick="switchMapsSubTab('search')">Search Name</div>
-            <div id="sub-tab-link" class="sub-tab" onclick="switchMapsSubTab('link')">Paste Link</div>
-        </div>
-
-        <div id="container-search" class="input-group">
-            <label for="autocomplete">Search Google Business</label>
-            <input type="text" id="autocomplete" placeholder="Type business name..." autocomplete="off">
-        </div>
-
-        <div id="container-link" class="input-group" style="display: none;">
-            <label for="mapsUrl">Paste Google Maps Link</label>
-            <input type="text" id="mapsUrl" placeholder="Paste full Google Maps address bar URL..." autocomplete="off">
-        </div>
-
-        <div id="warningBox" class="warning-box">
-            <h4>⚠️ Short Link Detected!</h4>
-            <p style="color: inherit; font-size: 12px; margin-bottom: 10px;">Google short links do not contain the needed Place details. Please get the full URL using these steps:</p>
-            <ol>
-                <li>Open the short link in any web browser.</li>
-                <li>Let the page load fully until you see the map and the search sidebar.</li>
-                <li>Go to the browser's address bar at the top, select and copy the complete, long URL.</li>
-                <li>Paste that expanded long URL into the box above.</li>
-            </ol>
-        </div>
-
-        <button id="actionBtn" disabled style="margin-bottom: 20px;">1. Choose a Business First</button>
+    <div class="header">
+        <button id="backBtn" class="back-btn" style="display: none;" onclick="goToMainMenu()">
+            ⬅ Back
+        </button>
+        <div class="icon" id="app-icon">🔮</div>
+        <h1 id="app-title">NFC Setup Suite</h1>
     </div>
 
-    <!-- SECTION 2: SOCIALS CONTROLS (With 7 Individual Inputs) -->
-    <div id="section-socials" style="display: none;">
-        <div class="socials-list" id="socialsContainer">
-            
-            <!-- YouTube (Auto-Subscribe) -->
-            <div class="social-card">
-                <div class="social-header">
-                    <span class="social-name">📺 YouTube (Auto-Subscribe)</span>
-                </div>
-                <div class="social-input-wrapper">
-                    <label for="input-youtube">YouTube Username/Channel</label>
-                    <input type="text" id="input-youtube" placeholder="e.g., graceautomation" oninput="updateSocialUrl('youtube')">
-                </div>
-                <span class="social-url" id="url-youtube">https://www.youtube.com/</span>
-                <button class="social-write-btn" onclick="triggerSocialWrite('youtube')">⚡ Write YouTube Tag</button>
-            </div>
+    <div class="user-status-bar">
+        <span>Status: <strong id="sessionUser">Standard Access</strong> <span id="sessionLimit"></span></span>
+    </div>
 
-            <!-- X / Twitter (Auto-Follow) -->
-            <div class="social-card">
-                <div class="social-header">
-                    <span class="social-name">🐦 X / Twitter (Auto-Follow)</span>
-                </div>
-                <div class="social-input-wrapper">
-                    <label for="input-twitter">X / Twitter Handle</label>
-                    <input type="text" id="input-twitter" placeholder="e.g., graceautomation" oninput="updateSocialUrl('twitter')">
-                </div>
-                <span class="social-url" id="url-twitter">https://twitter.com/</span>
-                <button class="social-write-btn" onclick="triggerSocialWrite('twitter')">⚡ Write X / Twitter Tag</button>
-            </div>
-
-            <!-- Facebook -->
-            <div class="social-card">
-                <div class="social-header">
-                    <span class="social-name">👥 Facebook</span>
-                </div>
-                <div class="social-input-wrapper">
-                    <label for="input-facebook">Facebook Profile/Page Name</label>
-                    <input type="text" id="input-facebook" placeholder="e.g., graceautomation" oninput="updateSocialUrl('facebook')">
-                </div>
-                <span class="social-url" id="url-facebook">https://www.facebook.com/</span>
-                <button class="social-write-btn" onclick="triggerSocialWrite('facebook')">⚡ Write Facebook Tag</button>
-            </div>
-
-            <!-- TikTok -->
-            <div class="social-card">
-                <div class="social-header">
-                    <span class="social-name">🎵 TikTok</span>
-                </div>
-                <div class="social-input-wrapper">
-                    <label for="input-tiktok">TikTok Username</label>
-                    <input type="text" id="input-tiktok" placeholder="e.g., graceautomation" oninput="updateSocialUrl('tiktok')">
-                </div>
-                <span class="social-url" id="url-tiktok">https://www.tiktok.com/</span>
-                <button class="social-write-btn" onclick="triggerSocialWrite('tiktok')">⚡ Write TikTok Tag</button>
-            </div>
-
-            <!-- Instagram -->
-            <div class="social-card">
-                <div class="social-header">
-                    <span class="social-name">📸 Instagram</span>
-                </div>
-                <div class="social-input-wrapper">
-                    <label for="input-instagram">Instagram Username</label>
-                    <input type="text" id="input-instagram" placeholder="e.g., graceautomation" oninput="updateSocialUrl('instagram')">
-                </div>
-                <span class="social-url" id="url-instagram">https://www.instagram.com/</span>
-                <button class="social-write-btn" onclick="triggerSocialWrite('instagram')">⚡ Write Instagram Tag</button>
-            </div>
-
-            <!-- LinkedIn -->
-            <div class="social-card">
-                <div class="social-header">
-                    <span class="social-name">💼 LinkedIn (Company Page)</span>
-                </div>
-                <div class="social-input-wrapper">
-                    <label for="input-linkedin">LinkedIn Company ID/Slug</label>
-                    <input type="text" id="input-linkedin" placeholder="e.g., graceautomation" oninput="updateSocialUrl('linkedin')">
-                </div>
-                <span class="social-url" id="url-linkedin">https://www.linkedin.com/</span>
-                <button class="social-write-btn" onclick="triggerSocialWrite('linkedin')">⚡ Write LinkedIn Tag</button>
-            </div>
-
-            <!-- Twitch -->
-            <div class="social-card">
-                <div class="social-header">
-                    <span class="social-name">🎮 Twitch</span>
-                </div>
-                <div class="social-input-wrapper">
-                    <label for="input-twitch">Twitch Channel Name</label>
-                    <input type="text" id="input-twitch" placeholder="e.g., graceautomation" oninput="updateSocialUrl('twitch')">
-                </div>
-                <span class="social-url" id="url-twitch">https://www.twitch.tv/</span>
-                <button class="social-write-btn" onclick="triggerSocialWrite('twitch')">⚡ Write Twitch Tag</button>
-            </div>
+    <div id="main-menu" class="grid-menu">
+        <div class="grid-item" onclick="openService('text')">
+            <span class="item-icon">📝</span>
+            <span class="item-label">Plain Text</span>
+        </div>
+        <div class="grid-item" onclick="openService('url')">
+            <span class="item-icon">🔗 Custom URL</span>
+            <span class="item-label">Web Link</span>
+        </div>
+        <div class="grid-item" onclick="openService('search')">
+            <span class="item-icon">🔍 Search Tool</span>
+            <span class="item-label">Product Search</span>
+        </div>
+        <div class="grid-item" onclick="openService('video')">
+            <span class="item-icon">🎬 Video Link</span>
+            <span class="item-label">YT / Video Web</span>
+        </div>
+        <div class="grid-item" onclick="openService('file')">
+            <span class="item-icon">📂 File Link</span>
+            <span class="item-label">Drive / PDF Doc</span>
+        </div>
+        <div class="grid-item" onclick="openService('app')">
+            <span class="item-icon">🚀 App Launcher</span>
+            <span class="item-label">App Link</span>
+        </div>
+        <div class="grid-item" onclick="openService('contact')">
+            <span class="item-icon">🪪 Contact Card</span>
+            <span class="item-label">vCard Contact</span>
+        </div>
+        <div class="grid-item" onclick="openService('phone')">
+            <span class="item-icon">📞 Phone Call</span>
+            <span class="item-label">Phone Number</span>
+        </div>
+        <div class="grid-item" onclick="openService('whatsapp')">
+            <span class="item-icon">💬 WhatsApp</span>
+            <span class="item-label">Send Message</span>
+        </div>
+        <div class="grid-item" onclick="openService('sms')">
+            <span class="item-icon">✉️ Send SMS</span>
+            <span class="item-label">SMS Dispatch</span>
+        </div>
+        <div class="grid-item" onclick="openService('address')">
+            <span class="item-icon">🗺️ Location</span>
+            <span class="item-label">Coords & Gmaps</span>
+        </div>
+        <div class="grid-item" onclick="openService('emergency')">
+            <span class="item-icon">🚨 Emergency</span>
+            <span class="item-label">Medical ICE Info</span>
+        </div>
+        <div class="grid-item" onclick="openService('bluetooth')">
+            <span class="item-icon">🔊 Bluetooth</span>
+            <span class="item-label">MAC Connect</span>
+        </div>
+        <div class="grid-item" onclick="openService('wifi')">
+            <span class="item-icon">📶 Guest Wi-Fi</span>
+            <span class="item-label">Access Credentials</span>
         </div>
     </div>
 
-    <!-- Live Preview Display Panel (Hidden by default, controlled by secret button) -->
+    <div id="ws-text" class="workspace">
+        <div class="workspace-header">📝 Plain Text Record</div>
+        <div class="suite-card">
+            <div class="input-group">
+                <label for="text-payload">Text Content</label>
+                <textarea id="text-payload" placeholder="Type text, notes, or messages to program..." oninput="updatePreview('text')"></textarea>
+            </div>
+            <button id="btn-write-text" class="primary-action-btn" onclick="writeTextTag()">⚡ Write Text Tag</button>
+        </div>
+    </div>
+
+    <div id="ws-url" class="workspace">
+        <div class="workspace-header">🔗 Custom URL / Web Link</div>
+        <div class="suite-card">
+            <div class="input-group">
+                <label for="url-payload">Target URL Address</label>
+                <input type="text" id="url-payload" placeholder="e.g., https://mywebsite.com" oninput="updatePreview('url')">
+            </div>
+            <button id="btn-write-url" class="primary-action-btn" onclick="writeUrlTag()">⚡ Write URL Tag</button>
+        </div>
+    </div>
+
+    <div id="ws-search" class="workspace">
+        <div class="workspace-header">🔍 Online Search Query</div>
+        <div class="suite-card">
+            <div class="input-group">
+                <label for="search-platform">Search Platform</label>
+                <select id="search-platform" onchange="updatePreview('search')">
+                    <option value="amazon">🛒 Amazon Search</option>
+                    <option value="google">🌐 Google Web Search</option>
+                    <option value="youtube">📺 YouTube Video Search</option>
+                    <option value="ebay">🏷️ eBay Search</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label for="search-query">Search Keyword / Product</label>
+                <input type="text" id="search-query" placeholder="e.g., Anker Power Bank" oninput="updatePreview('search')">
+            </div>
+            <button id="btn-write-search" class="primary-action-btn" onclick="writeSearchTag()">⚡ Write Search Tag</button>
+        </div>
+    </div>
+
+    <div id="ws-video" class="workspace">
+        <div class="workspace-header">🎬 Online Video Link</div>
+        <div class="suite-card">
+            <div class="input-group">
+                <label for="video-url">Video or Channel URL</label>
+                <input type="text" id="video-url" placeholder="e.g., https://youtube.com/watch?v=..." oninput="updatePreview('video')">
+            </div>
+            <button id="btn-write-video" class="primary-action-btn" onclick="writeVideoTag()">⚡ Write Video Tag</button>
+        </div>
+    </div>
+
+    <div id="ws-file" class="workspace">
+        <div class="workspace-header">📂 Document / File Link</div>
+        <div class="suite-card">
+            <div class="input-group">
+                <label for="file-url">Direct Link to File</label>
+                <input type="text" id="file-url" placeholder="e.g., Google Drive, Dropbox, or direct PDF link..." oninput="updatePreview('file')">
+            </div>
+            <button id="btn-write-file" class="primary-action-btn" onclick="writeFileTag()">⚡ Write File Link Tag</button>
+        </div>
+    </div>
+
+    <div id="ws-app" class="workspace">
+        <div class="workspace-header">🚀 App Launcher Link</div>
+        <div class="suite-card">
+            <div class="input-group">
+                <label for="app-package">App Package Identifier / App Store URL</label>
+                <input type="text" id="app-package" placeholder="e.g., com.miniclip.eightballpool" oninput="updatePreview('app')">
+            </div>
+            <button id="btn-write-app" class="primary-action-btn" onclick="writeAppTag()">⚡ Write Launcher Tag</button>
+        </div>
+    </div>
+
+    <div id="ws-contact" class="workspace">
+        <div class="workspace-header">🪪 Contact Information (vCard)</div>
+        <div class="suite-card">
+            <div class="row-inputs">
+                <div class="input-group">
+                    <label for="vcard-fname">First Name</label>
+                    <input type="text" id="vcard-fname" placeholder="John" oninput="updatePreview('contact')">
+                </div>
+                <div class="input-group">
+                    <label for="vcard-lname">Last Name</label>
+                    <input type="text" id="vcard-lname" placeholder="Doe" oninput="updatePreview('contact')">
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="vcard-company">Company</label>
+                <input type="text" id="vcard-company" placeholder="Acme Inc." oninput="updatePreview('contact')">
+            </div>
+            <div class="input-group">
+                <label for="vcard-addr">Physical Address</label>
+                <input type="text" id="vcard-addr" placeholder="123 Smart St, Tech City" oninput="updatePreview('contact')">
+            </div>
+            <div class="row-inputs">
+                <div class="input-group">
+                    <label for="vcard-phone">Phone Number</label>
+                    <input type="tel" id="vcard-phone" placeholder="+1234567890" oninput="updatePreview('contact')">
+                </div>
+                <div class="input-group">
+                    <label for="vcard-email">Email Address</label>
+                    <input type="email" id="vcard-email" placeholder="john@company.com" oninput="updatePreview('contact')">
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="vcard-website">Website Link</label>
+                <input type="url" id="vcard-website" placeholder="https://company.com" oninput="updatePreview('contact')">
+            </div>
+            <button id="btn-write-contact" class="primary-action-btn" onclick="writeContactTag()">⚡ Write Contact Tag</button>
+        </div>
+    </div>
+
+    <div id="ws-phone" class="workspace">
+        <div class="workspace-header">📞 Dial Phone Number</div>
+        <div class="suite-card">
+            <div class="input-group">
+                <label for="phone-number">Target Phone Number</label>
+                <input type="tel" id="phone-number" placeholder="e.g., +1234567890" oninput="updatePreview('phone')">
+            </div>
+            <button id="btn-write-phone" class="primary-action-btn" onclick="writePhoneTag()">⚡ Write Dialer Tag</button>
+        </div>
+    </div>
+
+    <div id="ws-whatsapp" class="workspace">
+        <div class="workspace-header">💬 WhatsApp Direct Dispatch</div>
+        <div class="suite-card">
+            <div class="input-group">
+                <label for="wa-phone">WhatsApp Number (with Country Code)</label>
+                <input type="tel" id="wa-phone" placeholder="e.g., 923001234567" oninput="updatePreview('whatsapp')">
+            </div>
+            <div class="input-group">
+                <label for="wa-msg">Optional Pre-filled Text Message</label>
+                <textarea id="wa-msg" placeholder="e.g., Hi, I am interested in your business..." oninput="updatePreview('whatsapp')"></textarea>
+            </div>
+            <button id="btn-write-whatsapp" class="primary-action-btn" onclick="writeWhatsappTag()">⚡ Write WhatsApp Tag</button>
+        </div>
+    </div>
+
+    <div id="ws-sms" class="workspace">
+        <div class="workspace-header">✉️ System SMS Dispatch</div>
+        <div class="suite-card">
+            <div class="input-group">
+                <label for="sms-phone">Recipient Phone Number</label>
+                <input type="tel" id="sms-phone" placeholder="e.g., +15551234567" oninput="updatePreview('sms')">
+            </div>
+            <div class="input-group">
+                <label for="sms-body">Preconfigured SMS Body</label>
+                <textarea id="sms-body" placeholder="Type SMS message contents..." oninput="updatePreview('sms')"></textarea>
+            </div>
+            <button id="btn-write-sms" class="primary-action-btn" onclick="writeSmsTag()">⚡ Write SMS Dispatcher</button>
+        </div>
+    </div>
+
+    <div id="ws-address" class="workspace">
+        <div class="workspace-header">🗺️ Coordinate Location & Navigation</div>
+        <div class="suite-card">
+            <div class="row-inputs">
+                <div class="input-group">
+                    <label for="geo-lat">Latitude Coordination</label>
+                    <input type="text" id="geo-lat" placeholder="e.g., 37.7749" oninput="updatePreview('address')">
+                </div>
+                <div class="input-group">
+                    <label for="geo-lon">Longitude Coordination</label>
+                    <input type="text" id="geo-lon" placeholder="e.g., -122.4194" oninput="updatePreview('address')">
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="geo-dest">Navigation Physical Address (Optional)</label>
+                <input type="text" id="geo-dest" placeholder="e.g., Times Square, New York" oninput="updatePreview('address')">
+            </div>
+            <button id="btn-write-address" class="primary-action-btn" onclick="writeLocationTag()">⚡ Write Location Tag</button>
+        </div>
+    </div>
+
+    <div id="ws-emergency" class="workspace">
+        <div class="workspace-header">🚨 ICE Medical Emergency Info</div>
+        <div class="suite-card">
+            <div class="row-inputs">
+                <div class="input-group">
+                    <label for="ice-name">Patient Name</label>
+                    <input type="text" id="ice-name" placeholder="John Doe" oninput="updatePreview('emergency')">
+                </div>
+                <div class="input-group">
+                    <label for="ice-blood">Blood Group</label>
+                    <input type="text" id="ice-blood" placeholder="O-positive" oninput="updatePreview('emergency')">
+                </div>
+            </div>
+            <div class="input-group">
+                <label for="ice-allergies">Allergies / Medical Notes</label>
+                <textarea id="ice-allergies" placeholder="e.g., Penicillin Allergy, Diabetic..." oninput="updatePreview('emergency')"></textarea>
+            </div>
+            <div class="input-group">
+                <label for="ice-contact">Emergency Contact (Name & Number)</label>
+                <input type="text" id="ice-contact" placeholder="Jane Doe: +1555000999" oninput="updatePreview('emergency')">
+            </div>
+            <button id="btn-write-emergency" class="primary-action-btn" onclick="writeEmergencyTag()">⚡ Write ICE Tag</button>
+        </div>
+    </div>
+
+    <div id="ws-bluetooth" class="workspace">
+        <div class="workspace-header">🔊 Bluetooth Target Connection</div>
+        <div class="suite-card">
+            <div class="input-group">
+                <label for="bt-name">Bluetooth Device Name</label>
+                <input type="text" id="bt-name" placeholder="e.g., Bose QuietComfort" oninput="updatePreview('bluetooth')">
+            </div>
+            <div class="input-group">
+                <label for="bt-mac">MAC Address Physical Code</label>
+                <input type="text" id="bt-mac" placeholder="e.g., 00:11:22:33:FF:EE" oninput="updatePreview('bluetooth')">
+            </div>
+            <button id="btn-write-bluetooth" class="primary-action-btn" onclick="writeBluetoothTag()">⚡ Write Bluetooth Tag</button>
+        </div>
+    </div>
+
+    <div id="ws-wifi" class="workspace">
+        <div class="workspace-header">📶 Secure Guest Wi-Fi Credentials</div>
+        <button id="scanner-trigger" class="scan-trigger-btn" onclick="toggleQrScanner()">📷 Scan Wi-Fi QR Code</button>
+        
+        <div id="scanner-container" class="scanner-container">
+            <div id="qr-reader"></div>
+        </div>
+
+        <div class="suite-card">
+            <div class="input-group">
+                <label for="wifi-ssid">Network SSID (Wi-Fi Name)</label>
+                <input type="text" id="wifi-ssid" placeholder="e.g., Home_Network" oninput="updatePreview('wifi')">
+            </div>
+
+            <div class="input-group">
+                <label for="wifi-pass">Wi-Fi Password</label>
+                <input type="password" id="wifi-pass" placeholder="Enter security key..." oninput="updatePreview('wifi')">
+            </div>
+
+            <div class="input-group">
+                <label for="wifi-auth">Network Security</label>
+                <select id="wifi-auth" onchange="updatePreview('wifi')">
+                    <option value="WPA">WPA/WPA2 Personal</option>
+                    <option value="WEP">WEP (Legacy)</option>
+                    <option value="NONE">Unsecured / Open</option>
+                </select>
+            </div>
+
+            <button id="wifiActionBtn" class="primary-action-btn" onclick="triggerWifiWrite()">⚡ Write Wi-Fi Tag</button>
+        </div>
+    </div>
+
     <div class="preview-box" id="previewBox">
-        <div class="preview-title">📡 Code to be programmed on tag:</div>
-        <span id="previewDisplay" class="preview-code">Waiting for business selection...</span>
+        <div class="preview-title">
+            <span>📡 Admin Data Payload:</span>
+            <span id="badgeIndicator" class="admin-badge">Standard Limit</span>
+        </div>
+        <span id="previewDisplay" class="preview-code">Waiting for input configuration...</span>
     </div>
     
-    <div id="status"></div>
+    <div id="status" style="display:none;"></div>
 </div>
 
-<gmp-map center="-33.8688, 151.2195" zoom="13" map-id="DEMO_MAP_ID">
-    <gmp-place-autocomplete id="google-auto-component" slot="control-inline-start-block-start"></gmp-place-autocomplete>
-</gmp-map>
-
 <script>
-    // Hidden Preview Switch (Default disabled)
-    let SHOW_PREVIEW_BOX = false; 
+    let isAdmin = false; 
+    let activeService = null;
+    let clickStreak = 0;
+    let lastClick = 0;
+    let html5QrcodeScanner = null;
 
-    let activeMainTab = 'maps';
-    let mapsSubTab = 'search';
-    let targetReviewUrl = '';
-    let isReadyToWrite = false;
-
-    // Element Selectors
-    const autocompleteInput = document.getElementById('autocomplete');
-    const mapsUrlInput = document.getElementById('mapsUrl');
     const previewBox = document.getElementById('previewBox');
     const previewDisplay = document.getElementById('previewDisplay');
-    const warningBox = document.getElementById('warningBox');
-    const actionBtn = document.getElementById('actionBtn');
+    const badgeIndicator = document.getElementById('badgeIndicator');
     const statusDiv = document.getElementById('status');
-    const secretBtn = document.getElementById('secretBtn');
-
-    // Initial Hide of preview panel
-    previewBox.style.display = SHOW_PREVIEW_BOX ? 'block' : 'none';
 
     // ==========================================
-    // 🕵️‍♂️ HIDDEN LONG PRESS CONTROLLER (4-Second Hold)
+    // NAVIGATION MANAGER
     // ==========================================
-    let holdTimer;
-    const holdDuration = 4000;
-
-    function startPress(e) {
-        e.preventDefault();
-        holdTimer = setTimeout(() => {
-            SHOW_PREVIEW_BOX = !SHOW_PREVIEW_BOX;
-            previewBox.style.display = SHOW_PREVIEW_BOX ? 'block' : 'none';
-            alert(`Preview Panel is now: ${SHOW_PREVIEW_BOX ? 'ENABLED' : 'DISABLED'}`);
-        }, holdDuration);
-    }
-
-    function endPress() {
-        clearTimeout(holdTimer);
-    }
-
-    secretBtn.addEventListener('mousedown', startPress);
-    secretBtn.addEventListener('mouseup', endPress);
-    secretBtn.addEventListener('mouseleave', endPress);
-    secretBtn.addEventListener('touchstart', startPress, { passive: false });
-    secretBtn.addEventListener('touchend', endPress);
-    secretBtn.addEventListener('touchcancel', endPress);
-
-    // ==========================================
-    // 🔀 NAVIGATION TABS (Main & Sub-Tabs)
-    // ==========================================
-    function switchMainTab(tabName) {
-        activeMainTab = tabName;
-        document.getElementById('tab-maps-group').classList.toggle('active', tabName === 'maps');
-        document.getElementById('tab-socials-group').classList.toggle('active', tabName === 'socials');
+    function openService(serviceId) {
+        activeService = serviceId;
         
-        document.getElementById('section-maps').style.display = tabName === 'maps' ? 'block' : 'none';
-        document.getElementById('section-socials').style.display = tabName === 'socials' ? 'block' : 'none';
+        // UI updates
+        document.getElementById('main-menu').style.display = 'none';
+        document.getElementById('backBtn').style.display = 'flex';
         
-        statusDiv.style.display = 'none';
-    }
+        // Capitalize title header
+        document.getElementById('app-title').innerText = "Configure Device";
+        document.getElementById('app-icon').innerText = getServiceIcon(serviceId);
 
-    function switchMapsSubTab(subTabName) {
-        mapsSubTab = subTabName;
-        document.getElementById('sub-tab-search').classList.toggle('active', subTabName === 'search');
-        document.getElementById('sub-tab-link').classList.toggle('active', subTabName === 'link');
-        
-        document.getElementById('container-search').style.display = subTabName === 'search' ? 'block' : 'none';
-        document.getElementById('container-link').style.display = subTabName === 'link' ? 'block' : 'none';
-        
-        resetMapsAppState();
-    }
-
-    function resetMapsAppState() {
-        targetReviewUrl = '';
-        isReadyToWrite = false;
-        previewDisplay.innerText = "Waiting for input...";
-        actionBtn.innerText = mapsSubTab === 'search' ? "1. Select Business First" : "1. Process Link";
-        actionBtn.disabled = mapsSubTab === 'search';
-        actionBtn.style.backgroundColor = '';
-        statusDiv.style.display = 'none';
-        warningBox.style.display = 'none';
-    }
-
-    // ==========================================
-    // 📍 GOOGLE MAPS AUTOMATION
-    // ==========================================
-    async function initGoogleLibrary() {
-        const { Place } = await google.maps.importLibrary("places");
-        
-        const autocomplete = new google.maps.places.Autocomplete(autocompleteInput, {
-            types: ['establishment'],
-            fields: ['place_id', 'name']
-        });
-
-        autocomplete.addListener('place_changed', () => {
-            const place = autocomplete.getPlace();
-            if (!place.place_id) {
-                showStatus("Please select a business from the autocomplete dropdown list.", "error");
-                return;
-            }
-
-            targetReviewUrl = `https://search.google.com/local/writereview?placeid=${place.place_id}`;
-            setReadyToWriteState(`Selected: "${place.name}"`);
-        });
-    }
-
-    window.onload = () => {
-        setTimeout(() => {
-            if (window.google && window.google.maps) {
-                initGoogleLibrary();
-            } else {
-                console.error("Google Maps Script failed to mount onto window.");
-            }
-        }, 1000);
-    };
-
-    mapsUrlInput.addEventListener('input', () => {
-        const rawUrl = mapsUrlInput.value.trim();
-        
-        const isShortLink = rawUrl.includes("goo.gl") || 
-                            rawUrl.includes("g.page") || 
-                            rawUrl.includes("app.goo.gl") || 
-                            rawUrl.includes("googleusercontent.com");
-
-        if (isShortLink) {
-            warningBox.style.display = 'block';
-            showStatus("⚠️ Short links cannot be parsed directly.", "error");
-            actionBtn.disabled = true;
-            isReadyToWrite = false;
-            return;
+        // Hide all screens first, then show selected
+        document.querySelectorAll('.workspace').forEach(ws => ws.style.display = 'none');
+        const activeWorkspace = document.getElementById(`ws-${serviceId}`);
+        if(activeWorkspace) {
+            activeWorkspace.style.display = 'block';
         }
 
-        warningBox.style.display = 'none';
-        resetMapsAppState();
-        if (rawUrl !== '') {
-            actionBtn.disabled = false;
+        // Clean error outputs and load current state preview
+        statusDiv.style.display = 'none';
+        updatePreview(serviceId);
+    }
+
+    function goToMainMenu() {
+        activeService = null;
+        stopQrScanner();
+
+        // UI Reset
+        document.getElementById('main-menu').style.display = 'grid';
+        document.getElementById('backBtn').style.display = 'none';
+        document.getElementById('app-title').innerText = "NFC Setup Suite";
+        document.getElementById('app-icon').innerText = "🔮";
+
+        document.querySelectorAll('.workspace').forEach(ws => ws.style.display = 'none');
+        statusDiv.style.display = 'none';
+    }
+
+    function getServiceIcon(serviceId) {
+        const icons = {
+            text: "📝", url: "🔗", search: "🔍", video: "🎬", file: "📂",
+            app: "🚀", contact: "🪪", phone: "📞", whatsapp: "💬",
+            sms: "✉️", address: "🗺️", emergency: "🚨", bluetooth: "🔊", wifi: "📶"
+        };
+        return icons[serviceId] || "🔮";
+    }
+
+    // ==========================================
+    // 🕵️‍♂️ SECRET ADMIN AUTHENTICATION
+    // ==========================================
+    function registerBtnClick() {
+        const now = Date.now();
+        clickStreak = (now - lastClick < 1500) ? clickStreak + 1 : 1;
+        lastClick = now;
+
+        if (clickStreak >= 5) {
+            clickStreak = 0;
+            const pass = prompt("Enter Admin Secret Key:");
+            if (pass === 'Zxc@3#1Zx@321$%(@&FS') {
+                isAdmin = true;
+                document.getElementById('sessionUser').innerText = "Admin Access";
+                badgeIndicator.innerText = "Admin (Unlimited)";
+                badgeIndicator.classList.add('active');
+                previewBox.style.display = 'block'; 
+                updateUsageDisplay();
+                showStatus("🎉 Admin authorized! Debug payload viewer is now visible.", "success");
+            } else if (pass !== null) {
+                showStatus("❌ Invalid Admin Password.", "error");
+            }
+        }
+    }
+
+    document.addEventListener('click', (e) => {
+        if (e.target && e.target.classList.contains('primary-action-btn')) {
+            registerBtnClick();
         }
     });
 
-    async function handleLinkProcess() {
-        const rawUrl = mapsUrlInput.value.trim();
-        if (!rawUrl) {
-            showStatus("Please paste a valid Google Maps link first.", "error");
+    // ==========================================
+    // 📊 USAGE RATE LIMITER
+    // ==========================================
+    function getTodayString() {
+        const d = new Date();
+        return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+    }
+
+    function getUsage() {
+        return parseInt(localStorage.getItem(`nfc_use_${getTodayString()}`) || '0', 10);
+    }
+
+    function incrementUsage() {
+        localStorage.setItem(`nfc_use_${getTodayString()}`, (getUsage() + 1).toString());
+        updateUsageDisplay();
+    }
+
+    function updateUsageDisplay() {
+        const limitEl = document.getElementById('sessionLimit');
+        if (isAdmin) {
+            limitEl.innerHTML = `(<span style="color: var(--success);">Unlimited Writes</span>)`;
+        } else {
+            const count = getUsage();
+            limitEl.innerHTML = `(<span style="color: ${count >= 10 ? 'var(--danger)' : 'var(--primary)'};">${count}/10 Writes Today</span>)`;
+        }
+    }
+    updateUsageDisplay();
+
+    // ==========================================
+    // DATA PREVIEW & SCHEMA ENGINE
+    // ==========================================
+    function updatePreview(serviceId) {
+        let text = "Waiting for input configuration...";
+        
+        if (serviceId === 'text') {
+            const val = document.getElementById('text-payload').value;
+            text = val ? val : "[Plain Text Record]";
+        } 
+        else if (serviceId === 'url') {
+            const val = document.getElementById('url-payload').value.trim();
+            text = val ? val : "[Target Web Link]";
+        }
+        else if (serviceId === 'search') {
+            const plat = document.getElementById('search-platform').value;
+            const query = encodeURIComponent(document.getElementById('search-query').value.trim());
+            if (query) {
+                if (plat === 'amazon') text = `https://www.amazon.com/s?k=${query}`;
+                else if (plat === 'google') text = `https://www.google.com/search?q=${query}`;
+                else if (plat === 'youtube') text = `https://www.youtube.com/results?search_query=${query}`;
+                else if (plat === 'ebay') text = `https://www.ebay.com/sch/i.html?_nkw=${query}`;
+            } else {
+                text = "[Awaiting Search Keywords...]";
+            }
+        }
+        else if (serviceId === 'video') {
+            const val = document.getElementById('video-url').value.trim();
+            text = val ? val : "[Video Target URL Link]";
+        }
+        else if (serviceId === 'file') {
+            const val = document.getElementById('file-url').value.trim();
+            text = val ? val : "[Document Target URL Link]";
+        }
+        else if (serviceId === 'app') {
+            const val = document.getElementById('app-package').value.trim();
+            text = val ? `android-app://${val}` : "[App Scheme / Package ID]";
+        }
+        else if (serviceId === 'contact') {
+            const fName = document.getElementById('vcard-fname').value.trim();
+            const lName = document.getElementById('vcard-lname').value.trim();
+            const org = document.getElementById('vcard-company').value.trim();
+            const addr = document.getElementById('vcard-addr').value.trim();
+            const phone = document.getElementById('vcard-phone').value.trim();
+            const email = document.getElementById('vcard-email').value.trim();
+            const web = document.getElementById('vcard-website').value.trim();
+            
+            if (fName || lName || phone) {
+                text = `BEGIN:VCARD\r\nVERSION:3.0\r\nFN:${fName} ${lName}\r\nN:${lName};${fName};;;\r\n`;
+                if(org) text += `ORG:${org}\r\n`;
+                if(addr) text += `ADR:;;${addr};;;;\r\n`;
+                if(phone) text += `TEL;TYPE=CELL:${phone}\r\n`;
+                if(email) text += `EMAIL;TYPE=INTERNET:${email}\r\n`;
+                if(web) text += `URL:${web}\r\n`;
+                text += "END:VCARD";
+            } else {
+                text = "[Enter Contact Name or Phone]";
+            }
+        }
+        else if (serviceId === 'phone') {
+            const val = document.getElementById('phone-number').value.trim();
+            text = val ? `tel:${val}` : "[Target Phone Line]";
+        }
+        else if (serviceId === 'whatsapp') {
+            const phone = document.getElementById('wa-phone').value.trim();
+            const msg = encodeURIComponent(document.getElementById('wa-msg').value);
+            text = phone ? `https://wa.me/${phone}${msg ? '?text=' + msg : ''}` : "[WhatsApp Contact Code]";
+        }
+        else if (serviceId === 'sms') {
+            const phone = document.getElementById('sms-phone').value.trim();
+            const body = encodeURIComponent(document.getElementById('sms-body').value);
+            text = phone ? `sms:${phone}${body ? '?body=' + body : ''}` : "[SMS Destination Scheme]";
+        }
+        else if (serviceId === 'address') {
+            const lat = document.getElementById('geo-lat').value.trim();
+            const lon = document.getElementById('geo-lon').value.trim();
+            const dest = encodeURIComponent(document.getElementById('geo-dest').value.trim());
+            
+            if (lat && lon) {
+                text = `geo:${lat},${lon}`;
+                if (dest) text = `https://www.google.com/maps/dir/?api=1&destination=${dest}`;
+            } else if (dest) {
+                text = `https://www.google.com/maps/dir/?api=1&destination=${dest}`;
+            } else {
+                text = "[Set Navigation Coords or Physical Location]";
+            }
+        }
+        else if (serviceId === 'emergency') {
+            const name = document.getElementById('ice-name').value.trim();
+            const blood = document.getElementById('ice-blood').value.trim();
+            const allergies = document.getElementById('ice-allergies').value.trim();
+            const contact = document.getElementById('ice-contact').value.trim();
+            
+            if(name || contact) {
+                text = `🚨 ICE EMERGENCY CARD 🚨\r\nName: ${name || 'N/A'}\r\nBlood Group: ${blood || 'N/A'}\r\nAllergies: ${allergies || 'N/A'}\r\nContact: ${contact || 'N/A'}`;
+            } else {
+                text = "[Input ICE Personnel Information]";
+            }
+        }
+        else if (serviceId === 'bluetooth') {
+            const name = document.getElementById('bt-name').value.trim();
+            const mac = document.getElementById('bt-mac').value.trim();
+            text = mac ? `bt:${mac}${name ? ';' + name : ''}` : "[Bluetooth Target Host Physical MAC Address]";
+        }
+        else if (serviceId === 'wifi') {
+            const ssid = document.getElementById('wifi-ssid').value.trim();
+            const pass = document.getElementById('wifi-pass').value.trim();
+            const auth = document.getElementById('wifi-auth').value;
+            text = ssid ? `WIFI:S:${ssid};T:${auth};P:${pass};;` : "Waiting for input configuration...";
+        }
+
+        previewDisplay.innerText = text;
+    }
+
+    // ==========================================
+    // INDIVIDUAL SERVICE WRITERS
+    // ==========================================
+    async function writeTextTag() {
+        const data = document.getElementById('text-payload').value;
+        if (!data) { showStatus("❌ Content is empty.", "error"); return; }
+        await writeNfc({ type: "text", data }, 'btn-write-text');
+    }
+
+    async function writeUrlTag() {
+        const data = document.getElementById('url-payload').value.trim();
+        if (!data) { showStatus("❌ URL field empty.", "error"); return; }
+        await writeNfc({ type: "url", data }, 'btn-write-url');
+    }
+
+    async function writeSearchTag() {
+        const previewText = previewDisplay.innerText;
+        if (previewText.startsWith("[")) { showStatus("❌ Please input keywords first.", "error"); return; }
+        await writeNfc({ type: "url", data: previewText }, 'btn-write-search');
+    }
+
+    async function writeVideoTag() {
+        const data = document.getElementById('video-url').value.trim();
+        if (!data) { showStatus("❌ Video link missing.", "error"); return; }
+        await writeNfc({ type: "url", data }, 'btn-write-video');
+    }
+
+    async function writeFileTag() {
+        const data = document.getElementById('file-url').value.trim();
+        if (!data) { showStatus("❌ URL field empty.", "error"); return; }
+        await writeNfc({ type: "url", data }, 'btn-write-file');
+    }
+
+    async function writeAppTag() {
+        const data = document.getElementById('app-package').value.trim();
+        if (!data) { showStatus("❌ Package identifier missing.", "error"); return; }
+        // Attempt custom deep launcher scheme or fallback to standard system URL
+        const dataPayload = `android-app://${data}`;
+        await writeNfc({ type: "url", data: dataPayload }, 'btn-write-app');
+    }
+
+    async function writeContactTag() {
+        const previewText = previewDisplay.innerText;
+        if (previewText.startsWith("[")) { showStatus("❌ Fill out Name/Phone parameters first.", "error"); return; }
+        await writeNfc({ type: "text", data: previewText }, 'btn-write-contact');
+    }
+
+    async function writePhoneTag() {
+        const phone = document.getElementById('phone-number').value.trim();
+        if (!phone) { showStatus("❌ Phone number is empty.", "error"); return; }
+        await writeNfc({ type: "url", data: `tel:${phone}` }, 'btn-write-phone');
+    }
+
+    async function writeWhatsappTag() {
+        const previewText = previewDisplay.innerText;
+        if (previewText.startsWith("[")) { showStatus("❌ Fill out phone target details.", "error"); return; }
+        await writeNfc({ type: "url", data: previewText }, 'btn-write-whatsapp');
+    }
+
+    async function writeSmsTag() {
+        const previewText = previewDisplay.innerText;
+        if (previewText.startsWith("[")) { showStatus("❌ Fill out recipient code details.", "error"); return; }
+        await writeNfc({ type: "url", data: previewText }, 'btn-write-sms');
+    }
+
+    async function writeLocationTag() {
+        const previewText = previewDisplay.innerText;
+        if (previewText.startsWith("[")) { showStatus("❌ Please define address details.", "error"); return; }
+        const writeType = previewText.startsWith("geo:") ? "text" : "url";
+        await writeNfc({ type: writeType, data: previewText }, 'btn-write-address');
+    }
+
+    async function writeEmergencyTag() {
+        const previewText = previewDisplay.innerText;
+        if (previewText.startsWith("[")) { showStatus("❌ Please define ICE details.", "error"); return; }
+        await writeNfc({ type: "text", data: previewText }, 'btn-write-emergency');
+    }
+
+    async function writeBluetoothTag() {
+        const previewText = previewDisplay.innerText;
+        if (previewText.startsWith("[")) { showStatus("❌ Define Bluetooth hardware details.", "error"); return; }
+        await writeNfc({ type: "text", data: previewText }, 'btn-write-bluetooth');
+    }
+
+    async function triggerWifiWrite() {
+        const ssid = document.getElementById('wifi-ssid').value.trim();
+        const pass = document.getElementById('wifi-pass').value.trim();
+        const auth = document.getElementById('wifi-auth').value;
+
+        if (!ssid) {
+            updateButtonFeedback('wifiActionBtn', 'error', '⚠️ Input SSID First');
+            return;
+        }
+        const wifiString = `WIFI:S:${ssid};T:${auth};P:${pass};;`;
+        await writeNfc({ type: "text", data: wifiString }, 'wifiActionBtn');
+    }
+
+    // ==========================================
+    // 📷 WI-FI QR CODE SCANNER (Original Engine)
+    // ==========================================
+    function toggleQrScanner() {
+        const container = document.getElementById('scanner-container');
+        const triggerBtn = document.getElementById('scanner-trigger');
+
+        if (container.style.display === 'block') {
+            stopQrScanner();
+        } else {
+            container.style.display = 'block';
+            triggerBtn.innerText = "🛑 Stop Camera Scanner";
+            triggerBtn.style.backgroundColor = "var(--danger)";
+            startQrScanner();
+        }
+    }
+
+    function startQrScanner() {
+        showStatus("📷 Requesting Camera Access...", "loading");
+        
+        html5QrcodeScanner = new Html5Qrcode("qr-reader");
+        html5QrcodeScanner.start(
+            { facingMode: "environment" }, 
+            {
+                fps: 10,
+                qrbox: { width: 220, height: 220 }
+            },
+            onQrCodeSuccess,
+            onQrCodeError
+        ).then(() => {
+            statusDiv.style.display = 'none';
+        }).catch(err => {
+            showStatus(`❌ Camera initialization failed: ${err}`, "error");
+            stopQrScanner();
+        });
+    }
+
+    function stopQrScanner() {
+        const container = document.getElementById('scanner-container');
+        const triggerBtn = document.getElementById('scanner-trigger');
+        
+        if (container) container.style.display = 'none';
+        if (triggerBtn) {
+            triggerBtn.innerText = "📷 Scan Wi-Fi QR Code";
+            triggerBtn.style.backgroundColor = "#4b5563";
+        }
+
+        if (html5QrcodeScanner) {
+            html5QrcodeScanner.stop().then(() => {
+                html5QrcodeScanner = null;
+            }).catch(err => console.warn("Error shutting down scanner:", err));
+        }
+    }
+
+    function onQrCodeSuccess(decodedText) {
+        if (!decodedText.toUpperCase().startsWith("WIFI:")) {
+            showStatus("⚠️ Scanned code is not a valid Wi-Fi configuration format.", "error");
             return;
         }
 
-        showStatus("🔍 Processing URL...", "loading");
+        stopQrScanner();
+        showStatus("✅ QR Code successfully decoded and populated!", "success");
 
         try {
-            const decodedUrl = decodeURIComponent(rawUrl);
+            const ssid = parseWifiParam(decodedText, 'S:');
+            const pass = parseWifiParam(decodedText, 'P:');
+            let auth = parseWifiParam(decodedText, 'T:');
 
-            const chijMatch = decodedUrl.match(/(ChIJ[a-zA-Z0-9_-]{23})/);
-            const hexMatch = decodedUrl.match(/!1s(0x[0-9a-fA-F]+:0x[0-9a-fA-F]+)/);
+            if (auth === 'WPA2' || auth === 'WPA') auth = 'WPA';
+            if (auth === '') auth = 'NONE';
 
-            if (chijMatch) {
-                targetReviewUrl = `https://search.google.com/local/writereview?placeid=${chijMatch[1]}`;
-                setReadyToWriteState("Link parsed successfully!");
-            } else if (hexMatch) {
-                targetReviewUrl = `https://search.google.com/local/writereview?fid=${hexMatch[1]}`;
-                setReadyToWriteState("Link parsed successfully!");
-            } else {
-                throw new Error("Could not find a Place ID inside this link. Verify you copied the correct business link.");
-            }
+            document.getElementById('wifi-ssid').value = ssid;
+            document.getElementById('wifi-pass').value = pass;
+            document.getElementById('wifi-auth').value = auth;
 
-        } catch (error) {
-            showStatus(`❌ ${error.message}`, "error");
-            resetAppState();
-            if (mapsSubTab === 'link') actionBtn.disabled = false;
+            updatePreview('wifi');
+        } catch (e) {
+            showStatus("❌ Failed to parse Wi-Fi data parameters from the QR Code.", "error");
         }
     }
 
-    function setReadyToWriteState(successMsg) {
-        isReadyToWrite = true;
-        previewDisplay.innerText = targetReviewUrl;
-        actionBtn.innerText = "⚡ Write to NFC Tag";
-        actionBtn.style.backgroundColor = "#059669";
-        actionBtn.disabled = false;
-        showStatus(`✅ ${successMsg}. Ready to write!`, "success");
-    }
+    function onQrCodeError(errorMessage) {}
 
-    actionBtn.addEventListener('click', async () => {
-        if (!isReadyToWrite && mapsSubTab === 'link') {
-            await handleLinkProcess();
-        } else if (isReadyToWrite) {
-            await writeNfcTag(targetReviewUrl);
-        }
-    });
-
-    // ==========================================
-    // 📱 SOCIALS INDIVIDUAL PARSING
-    // ==========================================
-    const socialPatterns = {
-        youtube: (usr) => `https://www.youtube.com/@${usr}?sub_confirmation=1`,
-        twitter: (usr) => `https://twitter.com/intent/user?screen_name=${usr}`,
-        facebook: (usr) => `https://www.facebook.com/${usr}`,
-        tiktok: (usr) => `https://www.tiktok.com/@${usr}`,
-        instagram: (usr) => `https://www.instagram.com/${usr}/`,
-        linkedin: (usr) => `https://www.linkedin.com/company/${usr}/`,
-        twitch: (usr) => `https://www.twitch.tv/${usr}`
-    };
-
-    // Reactively update only the specific platform URL when its input changes
-    function updateSocialUrl(platform) {
-        const inputEl = document.getElementById(`input-${platform}`);
-        const displayEl = document.getElementById(`url-${platform}`);
-        const username = inputEl.value.trim();
-
-        if (username) {
-            displayEl.innerText = socialPatterns[platform](username);
-        } else {
-            // Reset to clean fallback URL structure if input is cleared
-            displayEl.innerText = socialPatterns[platform]('username').replace('username', '').replace('@', '');
-        }
-    }
-
-    // Write execution for individual social buttons
-    async function triggerSocialWrite(platform) {
-        const inputEl = document.getElementById(`input-${platform}`);
-        const username = inputEl.value.trim();
+    function parseWifiParam(payload, marker) {
+        const index = payload.indexOf(marker);
+        if (index === -1) return '';
         
-        if (!username) {
-            showStatus(`⚠️ Please enter a profile username for ${platform.toUpperCase()} first.`, "error");
+        let sub = payload.substring(index + marker.length);
+        let endIdx = sub.indexOf(';');
+        
+        while (endIdx !== -1 && sub.charAt(endIdx - 1) === '\\') {
+            endIdx = sub.indexOf(';', endIdx + 1);
+        }
+        
+        const rawParam = endIdx !== -1 ? sub.substring(0, endIdx) : sub;
+        return rawParam.replace(/\\;/g, ';').replace(/\\:/g, ':').replace(/\\,/g, ',').replace(/\\\\/g, '\\');
+    }
+
+    // ==========================================
+    // 🎛️ DYNAMIC BUTTON FEEDBACK
+    // ==========================================
+    function updateButtonFeedback(buttonId, state, customMsg = "") {
+        const btn = document.getElementById(buttonId);
+        if (!btn) return;
+
+        const defaultLabel = btn.getAttribute('data-original-text') || btn.innerText;
+        if (!btn.getAttribute('data-original-text')) {
+            btn.setAttribute('data-original-text', defaultLabel);
+        }
+
+        btn.className = "primary-action-btn";
+
+        if (state === 'loading') {
+            btn.classList.add('btn-loading');
+            btn.innerText = "⌛ Tap NFC Tag Now...";
+            btn.disabled = true;
+        } else if (state === 'success') {
+            btn.classList.add('btn-success');
+            btn.innerText = "🎉 Tag Programmed!";
+            btn.disabled = true;
+            setTimeout(() => { btn.className = "primary-action-btn"; btn.innerText = defaultLabel; btn.disabled = false; }, 3000);
+        } else if (state === 'error') {
+            btn.classList.add('btn-error');
+            btn.innerText = customMsg || "❌ Write Failed";
+            btn.disabled = true;
+            setTimeout(() => { btn.className = "primary-action-btn"; btn.innerText = defaultLabel; btn.disabled = false; }, 3000);
+        }
+    }
+
+    // ==========================================
+    // ⚡ WEBNFC ENGINE
+    // ==========================================
+    async function writeNfc(payload, buttonId) {
+        if (!isAdmin && getUsage() >= 10) {
+            updateButtonFeedback(buttonId, "error", "❌ Limit Exceeded (10/day)");
+            showStatus("❌ RATE LIMIT EXCEEDED: Standard users can write a max of 10 tags per day.", "error");
             return;
         }
 
-        const generatedUrl = socialPatterns[platform](username);
-        previewDisplay.innerText = generatedUrl;
-        
-        await writeNfcTag(generatedUrl);
-    }
-
-    // ==========================================
-    // ⚡ COMMON WEBNFC EXECUTION ENGINE
-    // ==========================================
-    async function writeNfcTag(writeUrl) {
         if (!('NDEFReader' in window)) {
+            updateButtonFeedback(buttonId, "error", "❌ Use Chrome on Android");
             showStatus("❌ NFC programming is only supported using Google Chrome on Android.", "error");
             return;
         }
 
         try {
-            showStatus(`⌛ TAP TAG: Hold tag against your phone to program: ${writeUrl}`, "loading");
-            if (activeMainTab === 'maps') actionBtn.disabled = true;
+            updateButtonFeedback(buttonId, "loading");
+            showStatus(`⌛ TAP TAG: Hold tag against phone to program...`, "loading");
 
             const ndef = new NDEFReader();
-            await ndef.write({
-                records: [{ recordType: "url", data: writeUrl }]
-            });
+            
+            let ndefRecord = {};
+            if (payload.type === "url") {
+                ndefRecord = { recordType: "url", data: payload.data };
+            } else if (payload.type === "text") {
+                ndefRecord = { recordType: "text", data: payload.data };
+            }
 
+            await ndef.write({ records: [ndefRecord] });
+
+            if (!isAdmin) incrementUsage();
+
+            updateButtonFeedback(buttonId, "success");
             showStatus("🎉 SUCCESS! Your NFC Tag has been permanently programmed.", "success");
-            if (activeMainTab === 'maps') actionBtn.disabled = false;
         } catch (error) {
-            showStatus(`❌ NFC Write Failed: ${error.message}. Please tap again.`, "error");
-            if (activeMainTab === 'maps') actionBtn.disabled = false;
+            updateButtonFeedback(buttonId, "error", "❌ Write Failed");
+            showStatus(`❌ NFC Write Failed: ${error.message}. Please try again.`, "error");
         }
     }
 
-    function showStatus(message, type) {
+    function showStatus(msg, type) {
         statusDiv.className = '';
-        statusDiv.innerText = message;
+        statusDiv.innerText = msg;
         if (type === 'loading') statusDiv.classList.add('status-loading');
         if (type === 'success') statusDiv.classList.add('status-success');
         if (type === 'error') statusDiv.classList.add('status-error');
