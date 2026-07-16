@@ -100,7 +100,15 @@
             margin-bottom: 20px;
         }
 
-        /* SCREEN 1: Grid Menu (2 columns, 7 rows layout to fit 14 cleanly) */
+        /* LOGIN WALL */
+        #login-screen {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            text-align: left;
+        }
+
+        /* SCREEN 1: Grid Menu (2 columns layout to fit 15 options cleanly) */
         .grid-menu {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -354,333 +362,429 @@
 <body>
 
 <div class="card">
+    <!-- Application Header -->
     <div class="header">
         <button id="backBtn" class="back-btn" style="display: none;" onclick="goToMainMenu()">
             ⬅ Back
         </button>
-        <div class="icon" id="app-icon">🔮</div>
-        <h1 id="app-title">NFC Setup Suite</h1>
+        <div class="icon" id="app-icon">🔒</div>
+        <h1 id="app-title">NFC Security Wall</h1>
     </div>
 
-    <div class="user-status-bar">
-        <span>Status: <strong id="sessionUser">Standard Access</strong> <span id="sessionLimit"></span></span>
+    <!-- ========================================== -->
+    <!-- SECURE GATEWAY LOGIN PAGE -->
+    <!-- ========================================== -->
+    <div id="login-screen">
+        <div class="input-group">
+            <label for="login-user">Admin Username</label>
+            <input type="text" id="login-user" placeholder="Enter admin username..." autocomplete="off">
+        </div>
+        <div class="input-group">
+            <label for="login-pass">Admin Password</label>
+            <input type="password" id="login-pass" placeholder="Enter security key..." autocomplete="off">
+        </div>
+        <button class="primary-action-btn" onclick="validateLogin()">🔓 Unlock Application Suite</button>
     </div>
 
-    <div id="main-menu" class="grid-menu">
-        <div class="grid-item" onclick="openService('text')">
-            <span class="item-icon">📝</span>
-            <span class="item-label">Plain Text</span>
+    <!-- ========================================== -->
+    <!-- SECURE MAIN APPLICATION CONTAINER -->
+    <!-- ========================================== -->
+    <div id="app-container" style="display: none;">
+        <!-- Status Limit Banner -->
+        <div class="user-status-bar">
+            <span>Status: <strong id="sessionUser">Standard Access</strong> <span id="sessionLimit"></span></span>
         </div>
-        <div class="grid-item" onclick="openService('url')">
-            <span class="item-icon">🔗 Custom URL</span>
-            <span class="item-label">Web Link</span>
-        </div>
-        <div class="grid-item" onclick="openService('search')">
-            <span class="item-icon">🔍 Search Tool</span>
-            <span class="item-label">Product Search</span>
-        </div>
-        <div class="grid-item" onclick="openService('video')">
-            <span class="item-icon">🎬 Video Link</span>
-            <span class="item-label">YT / Video Web</span>
-        </div>
-        <div class="grid-item" onclick="openService('file')">
-            <span class="item-icon">📂 File Link</span>
-            <span class="item-label">Drive / PDF Doc</span>
-        </div>
-        <div class="grid-item" onclick="openService('app')">
-            <span class="item-icon">🚀 App Launcher</span>
-            <span class="item-label">App Link</span>
-        </div>
-        <div class="grid-item" onclick="openService('contact')">
-            <span class="item-icon">🪪 Contact Card</span>
-            <span class="item-label">vCard Contact</span>
-        </div>
-        <div class="grid-item" onclick="openService('phone')">
-            <span class="item-icon">📞 Phone Call</span>
-            <span class="item-label">Phone Number</span>
-        </div>
-        <div class="grid-item" onclick="openService('whatsapp')">
-            <span class="item-icon">💬 WhatsApp</span>
-            <span class="item-label">Send Message</span>
-        </div>
-        <div class="grid-item" onclick="openService('sms')">
-            <span class="item-icon">✉️ Send SMS</span>
-            <span class="item-label">SMS Dispatch</span>
-        </div>
-        <div class="grid-item" onclick="openService('address')">
-            <span class="item-icon">🗺️ Location</span>
-            <span class="item-label">Coords & Gmaps</span>
-        </div>
-        <div class="grid-item" onclick="openService('emergency')">
-            <span class="item-icon">🚨 Emergency</span>
-            <span class="item-label">Medical ICE Info</span>
-        </div>
-        <div class="grid-item" onclick="openService('bluetooth')">
-            <span class="item-icon">🔊 Bluetooth</span>
-            <span class="item-label">MAC Connect</span>
-        </div>
-        <div class="grid-item" onclick="openService('wifi')">
-            <span class="item-icon">📶 Guest Wi-Fi</span>
-            <span class="item-label">Access Credentials</span>
-        </div>
-    </div>
 
-    <div id="ws-text" class="workspace">
-        <div class="workspace-header">📝 Plain Text Record</div>
-        <div class="suite-card">
-            <div class="input-group">
-                <label for="text-payload">Text Content</label>
-                <textarea id="text-payload" placeholder="Type text, notes, or messages to program..." oninput="updatePreview('text')"></textarea>
+        <!-- SCREEN 1: 2-COLUMN SERVICE SELECTOR MENU -->
+        <div id="main-menu" class="grid-menu">
+            <div class="grid-item" onclick="openService('maps')">
+                <span class="item-icon">📍</span>
+                <span class="item-label">Maps Parser</span>
             </div>
-            <button id="btn-write-text" class="primary-action-btn" onclick="writeTextTag()">⚡ Write Text Tag</button>
-        </div>
-    </div>
-
-    <div id="ws-url" class="workspace">
-        <div class="workspace-header">🔗 Custom URL / Web Link</div>
-        <div class="suite-card">
-            <div class="input-group">
-                <label for="url-payload">Target URL Address</label>
-                <input type="text" id="url-payload" placeholder="e.g., https://mywebsite.com" oninput="updatePreview('url')">
+            <div class="grid-item" onclick="openService('socials')">
+                <span class="item-icon">📱</span>
+                <span class="item-label">Social Links</span>
             </div>
-            <button id="btn-write-url" class="primary-action-btn" onclick="writeUrlTag()">⚡ Write URL Tag</button>
-        </div>
-    </div>
-
-    <div id="ws-search" class="workspace">
-        <div class="workspace-header">🔍 Online Search Query</div>
-        <div class="suite-card">
-            <div class="input-group">
-                <label for="search-platform">Search Platform</label>
-                <select id="search-platform" onchange="updatePreview('search')">
-                    <option value="amazon">🛒 Amazon Search</option>
-                    <option value="google">🌐 Google Web Search</option>
-                    <option value="youtube">📺 YouTube Video Search</option>
-                    <option value="ebay">🏷️ eBay Search</option>
-                </select>
+            <div class="grid-item" onclick="openService('text')">
+                <span class="item-icon">📝</span>
+                <span class="item-label">Plain Text</span>
             </div>
-            <div class="input-group">
-                <label for="search-query">Search Keyword / Product</label>
-                <input type="text" id="search-query" placeholder="e.g., Anker Power Bank" oninput="updatePreview('search')">
+            <div class="grid-item" onclick="openService('url')">
+                <span class="item-icon">🔗</span>
+                <span class="item-label">Custom URL</span>
             </div>
-            <button id="btn-write-search" class="primary-action-btn" onclick="writeSearchTag()">⚡ Write Search Tag</button>
-        </div>
-    </div>
-
-    <div id="ws-video" class="workspace">
-        <div class="workspace-header">🎬 Online Video Link</div>
-        <div class="suite-card">
-            <div class="input-group">
-                <label for="video-url">Video or Channel URL</label>
-                <input type="text" id="video-url" placeholder="e.g., https://youtube.com/watch?v=..." oninput="updatePreview('video')">
+            <div class="grid-item" onclick="openService('search')">
+                <span class="item-icon">🔍</span>
+                <span class="item-label">Product Search</span>
             </div>
-            <button id="btn-write-video" class="primary-action-btn" onclick="writeVideoTag()">⚡ Write Video Tag</button>
-        </div>
-    </div>
-
-    <div id="ws-file" class="workspace">
-        <div class="workspace-header">📂 Document / File Link</div>
-        <div class="suite-card">
-            <div class="input-group">
-                <label for="file-url">Direct Link to File</label>
-                <input type="text" id="file-url" placeholder="e.g., Google Drive, Dropbox, or direct PDF link..." oninput="updatePreview('file')">
+            <div class="grid-item" onclick="openService('video')">
+                <span class="item-icon">🎬</span>
+                <span class="item-label">Video Link</span>
             </div>
-            <button id="btn-write-file" class="primary-action-btn" onclick="writeFileTag()">⚡ Write File Link Tag</button>
-        </div>
-    </div>
-
-    <div id="ws-app" class="workspace">
-        <div class="workspace-header">🚀 App Launcher Link</div>
-        <div class="suite-card">
-            <div class="input-group">
-                <label for="app-package">App Package Identifier / App Store URL</label>
-                <input type="text" id="app-package" placeholder="e.g., com.miniclip.eightballpool" oninput="updatePreview('app')">
+            <div class="grid-item" onclick="openService('file')">
+                <span class="item-icon">📂</span>
+                <span class="item-label">File Link</span>
             </div>
-            <button id="btn-write-app" class="primary-action-btn" onclick="writeAppTag()">⚡ Write Launcher Tag</button>
+            <div class="grid-item" onclick="openService('app')">
+                <span class="item-icon">🚀</span>
+                <span class="item-label">App Link</span>
+            </div>
+            <div class="grid-item" onclick="openService('contact')">
+                <span class="item-icon">🪪</span>
+                <span class="item-label">Contact Card</span>
+            </div>
+            <div class="grid-item" onclick="openService('phone')">
+                <span class="item-icon">📞</span>
+                <span class="item-label">Phone Number</span>
+            </div>
+            <div class="grid-item" onclick="openService('whatsapp')">
+                <span class="item-icon">💬</span>
+                <span class="item-label">WhatsApp Link</span>
+            </div>
+            <div class="grid-item" onclick="openService('sms')">
+                <span class="item-icon">✉️</span>
+                <span class="item-label">Send SMS</span>
+            </div>
+            <div class="grid-item" onclick="openService('address')">
+                <span class="item-icon">🗺️</span>
+                <span class="item-label">Location/Nav</span>
+            </div>
+            <div class="grid-item" onclick="openService('emergency')">
+                <span class="item-icon">🚨</span>
+                <span class="item-label">Emergency ICE</span>
+            </div>
+            <div class="grid-item" onclick="openService('bluetooth')">
+                <span class="item-icon">🔊</span>
+                <span class="item-label">Bluetooth</span>
+            </div>
+            <div class="grid-item" onclick="openService('wifi')">
+                <span class="item-icon">📶</span>
+                <span class="item-label">Guest Wi-Fi</span>
+            </div>
         </div>
-    </div>
 
-    <div id="ws-contact" class="workspace">
-        <div class="workspace-header">🪪 Contact Information (vCard)</div>
-        <div class="suite-card">
-            <div class="row-inputs">
+        <!-- ========================================== -->
+        <!-- SCREEN 2: WORKSPACE CONTAINERS -->
+        <!-- ========================================== -->
+
+        <!-- ORIGINAL - GOOGLE MAPS LINK PARSER -->
+        <div id="ws-maps" class="workspace">
+            <div class="workspace-header">📍 Google Maps Link Parser[cite: 1]</div>
+            <div class="instruction-box">
+                <h4>🔗 How to get the correct Link:[cite: 1]</h4>
+                <ol>
+                    <li>Search your business in Google Maps on your browser or mobile phone.[cite: 1]</li>
+                    <li>If on mobile, tap <strong>Share</strong>, then copy the short link and open it in a browser first.[cite: 1]</li>
+                    <li>Once loaded completely, copy the <strong>entire, long URL</strong> from the browser's top address bar.[cite: 1]</li>
+                    <li>Paste that full URL down below to parse its Place parameters correctly.[cite: 1]</li>
+                </ol>
+            </div>
+            <div class="suite-card">
                 <div class="input-group">
-                    <label for="vcard-fname">First Name</label>
-                    <input type="text" id="vcard-fname" placeholder="John" oninput="updatePreview('contact')">
+                    <label for="mapsUrl">Paste Google Maps Link</label>
+                    <input type="text" id="mapsUrl" placeholder="Paste full address bar URL here..." autocomplete="off">
+                </div>
+                <button id="mapsActionBtn" class="primary-action-btn" onclick="handleLinkProcess()">⚡ Parse & Write Maps Tag</button>
+            </div>
+        </div>
+
+        <!-- ORIGINAL - SOCIAL PLATFORM PROFILER -->
+        <div id="ws-socials" class="workspace">
+            <div class="workspace-header">📱 Social Platform Link Profiler</div>
+            <div class="suite-card">
+                <div class="input-group">
+                    <label for="social-platform">Select Social Platform</label>
+                    <select id="social-platform" onchange="handlePlatformChange()">
+                        <option value="youtube">📺 YouTube (Auto-Subscribe)</option>
+                        <option value="twitter">🐦 X / Twitter (Auto-Follow)</option>
+                        <option value="facebook">👥 Facebook Profile/Page</option>
+                        <option value="tiktok">🎵 TikTok Profile</option>
+                        <option value="instagram">📸 Instagram Profile</option>
+                        <option value="linkedin">💼 LinkedIn Company Page</option>
+                        <option value="twitch">🎮 Twitch Channel</option>
+                    </select>
                 </div>
                 <div class="input-group">
-                    <label for="vcard-lname">Last Name</label>
-                    <input type="text" id="vcard-lname" placeholder="Doe" oninput="updatePreview('contact')">
+                    <label id="social-input-label" for="social-username">YouTube Username/Channel</label>
+                    <input type="text" id="social-username" placeholder="e.g., graceautomation" oninput="updatePreview('socials')">
                 </div>
+                <button id="socialActionBtn" class="primary-action-btn" onclick="triggerSocialWrite()">⚡ Write Social Tag</button>
             </div>
-            <div class="input-group">
-                <label for="vcard-company">Company</label>
-                <input type="text" id="vcard-company" placeholder="Acme Inc." oninput="updatePreview('contact')">
-            </div>
-            <div class="input-group">
-                <label for="vcard-addr">Physical Address</label>
-                <input type="text" id="vcard-addr" placeholder="123 Smart St, Tech City" oninput="updatePreview('contact')">
-            </div>
-            <div class="row-inputs">
+        </div>
+
+        <!-- 1. PLAIN TEXT WORKSPACE -->
+        <div id="ws-text" class="workspace">
+            <div class="workspace-header">📝 Plain Text Record</div>
+            <div class="suite-card">
                 <div class="input-group">
-                    <label for="vcard-phone">Phone Number</label>
-                    <input type="tel" id="vcard-phone" placeholder="+1234567890" oninput="updatePreview('contact')">
+                    <label for="text-payload">Text Content</label>
+                    <textarea id="text-payload" placeholder="Type text, notes, or messages to program..." oninput="updatePreview('text')"></textarea>
                 </div>
+                <button id="btn-write-text" class="primary-action-btn" onclick="writeTextTag()">⚡ Write Text Tag</button>
+            </div>
+        </div>
+
+        <!-- 2. CUSTOM URL WORKSPACE -->
+        <div id="ws-url" class="workspace">
+            <div class="workspace-header">🔗 Custom URL / Web Link</div>
+            <div class="suite-card">
                 <div class="input-group">
-                    <label for="vcard-email">Email Address</label>
-                    <input type="email" id="vcard-email" placeholder="john@company.com" oninput="updatePreview('contact')">
+                    <label for="url-payload">Target URL Address</label>
+                    <input type="text" id="url-payload" placeholder="e.g., https://mywebsite.com" oninput="updatePreview('url')">
                 </div>
+                <button id="btn-write-url" class="primary-action-btn" onclick="writeUrlTag()">⚡ Write URL Tag</button>
             </div>
-            <div class="input-group">
-                <label for="vcard-website">Website Link</label>
-                <input type="url" id="vcard-website" placeholder="https://company.com" oninput="updatePreview('contact')">
-            </div>
-            <button id="btn-write-contact" class="primary-action-btn" onclick="writeContactTag()">⚡ Write Contact Tag</button>
         </div>
-    </div>
 
-    <div id="ws-phone" class="workspace">
-        <div class="workspace-header">📞 Dial Phone Number</div>
-        <div class="suite-card">
-            <div class="input-group">
-                <label for="phone-number">Target Phone Number</label>
-                <input type="tel" id="phone-number" placeholder="e.g., +1234567890" oninput="updatePreview('phone')">
-            </div>
-            <button id="btn-write-phone" class="primary-action-btn" onclick="writePhoneTag()">⚡ Write Dialer Tag</button>
-        </div>
-    </div>
-
-    <div id="ws-whatsapp" class="workspace">
-        <div class="workspace-header">💬 WhatsApp Direct Dispatch</div>
-        <div class="suite-card">
-            <div class="input-group">
-                <label for="wa-phone">WhatsApp Number (with Country Code)</label>
-                <input type="tel" id="wa-phone" placeholder="e.g., 923001234567" oninput="updatePreview('whatsapp')">
-            </div>
-            <div class="input-group">
-                <label for="wa-msg">Optional Pre-filled Text Message</label>
-                <textarea id="wa-msg" placeholder="e.g., Hi, I am interested in your business..." oninput="updatePreview('whatsapp')"></textarea>
-            </div>
-            <button id="btn-write-whatsapp" class="primary-action-btn" onclick="writeWhatsappTag()">⚡ Write WhatsApp Tag</button>
-        </div>
-    </div>
-
-    <div id="ws-sms" class="workspace">
-        <div class="workspace-header">✉️ System SMS Dispatch</div>
-        <div class="suite-card">
-            <div class="input-group">
-                <label for="sms-phone">Recipient Phone Number</label>
-                <input type="tel" id="sms-phone" placeholder="e.g., +15551234567" oninput="updatePreview('sms')">
-            </div>
-            <div class="input-group">
-                <label for="sms-body">Preconfigured SMS Body</label>
-                <textarea id="sms-body" placeholder="Type SMS message contents..." oninput="updatePreview('sms')"></textarea>
-            </div>
-            <button id="btn-write-sms" class="primary-action-btn" onclick="writeSmsTag()">⚡ Write SMS Dispatcher</button>
-        </div>
-    </div>
-
-    <div id="ws-address" class="workspace">
-        <div class="workspace-header">🗺️ Coordinate Location & Navigation</div>
-        <div class="suite-card">
-            <div class="row-inputs">
+        <!-- 3. SEARCH ENGINE WORKSPACE -->
+        <div id="ws-search" class="workspace">
+            <div class="workspace-header">🔍 Online Search Query</div>
+            <div class="suite-card">
                 <div class="input-group">
-                    <label for="geo-lat">Latitude Coordination</label>
-                    <input type="text" id="geo-lat" placeholder="e.g., 37.7749" oninput="updatePreview('address')">
+                    <label for="search-platform">Search Platform</label>
+                    <select id="search-platform" onchange="updatePreview('search')">
+                        <option value="amazon">🛒 Amazon Search</option>
+                        <option value="google">🌐 Google Web Search</option>
+                        <option value="youtube">📺 YouTube Video Search</option>
+                        <option value="ebay">🏷️ eBay Search</option>
+                    </select>
                 </div>
                 <div class="input-group">
-                    <label for="geo-lon">Longitude Coordination</label>
-                    <input type="text" id="geo-lon" placeholder="e.g., -122.4194" oninput="updatePreview('address')">
+                    <label for="search-query">Search Keyword / Product</label>
+                    <input type="text" id="search-query" placeholder="e.g., Anker Power Bank" oninput="updatePreview('search')">
                 </div>
+                <button id="btn-write-search" class="primary-action-btn" onclick="writeSearchTag()">⚡ Write Search Tag</button>
             </div>
-            <div class="input-group">
-                <label for="geo-dest">Navigation Physical Address (Optional)</label>
-                <input type="text" id="geo-dest" placeholder="e.g., Times Square, New York" oninput="updatePreview('address')">
-            </div>
-            <button id="btn-write-address" class="primary-action-btn" onclick="writeLocationTag()">⚡ Write Location Tag</button>
         </div>
-    </div>
 
-    <div id="ws-emergency" class="workspace">
-        <div class="workspace-header">🚨 ICE Medical Emergency Info</div>
-        <div class="suite-card">
-            <div class="row-inputs">
+        <!-- 4. VIDEO LINK WORKSPACE -->
+        <div id="ws-video" class="workspace">
+            <div class="workspace-header">🎬 Online Video Link</div>
+            <div class="suite-card">
                 <div class="input-group">
-                    <label for="ice-name">Patient Name</label>
-                    <input type="text" id="ice-name" placeholder="John Doe" oninput="updatePreview('emergency')">
+                    <label for="video-url">Video or Channel URL</label>
+                    <input type="text" id="video-url" placeholder="e.g., https://youtube.com/watch?v=..." oninput="updatePreview('video')">
+                </div>
+                <button id="btn-write-video" class="primary-action-btn" onclick="writeVideoTag()">⚡ Write Video Tag</button>
+            </div>
+        </div>
+
+        <!-- 5. FILE LINK WORKSPACE -->
+        <div id="ws-file" class="workspace">
+            <div class="workspace-header">📂 Document / File Link</div>
+            <div class="suite-card">
+                <div class="input-group">
+                    <label for="file-url">Direct Link to File</label>
+                    <input type="text" id="file-url" placeholder="e.g., Google Drive, Dropbox, or direct PDF link..." oninput="updatePreview('file')">
+                </div>
+                <button id="btn-write-file" class="primary-action-btn" onclick="writeFileTag()">⚡ Write File Link Tag</button>
+            </div>
+        </div>
+
+        <!-- 6. APP LAUNCHER WORKSPACE -->
+        <div id="ws-app" class="workspace">
+            <div class="workspace-header">🚀 App Launcher Link</div>
+            <div class="suite-card">
+                <div class="input-group">
+                    <label for="app-package">App Package Identifier / App Store URL</label>
+                    <input type="text" id="app-package" placeholder="e.g., com.miniclip.eightballpool" oninput="updatePreview('app')">
+                </div>
+                <button id="btn-write-app" class="primary-action-btn" onclick="writeAppTag()">⚡ Write Launcher Tag</button>
+            </div>
+        </div>
+
+        <!-- 7. CONTACT CARD (vCARD) WORKSPACE -->
+        <div id="ws-contact" class="workspace">
+            <div class="workspace-header">🪪 Contact Information (vCard)</div>
+            <div class="suite-card">
+                <div class="row-inputs">
+                    <div class="input-group">
+                        <label for="vcard-fname">First Name</label>
+                        <input type="text" id="vcard-fname" placeholder="John" oninput="updatePreview('contact')">
+                    </div>
+                    <div class="input-group">
+                        <label for="vcard-lname">Last Name</label>
+                        <input type="text" id="vcard-lname" placeholder="Doe" oninput="updatePreview('contact')">
+                    </div>
                 </div>
                 <div class="input-group">
-                    <label for="ice-blood">Blood Group</label>
-                    <input type="text" id="ice-blood" placeholder="O-positive" oninput="updatePreview('emergency')">
+                    <label for="vcard-company">Company</label>
+                    <input type="text" id="vcard-company" placeholder="Acme Inc." oninput="updatePreview('contact')">
                 </div>
+                <div class="input-group">
+                    <label for="vcard-addr">Physical Address</label>
+                    <input type="text" id="vcard-addr" placeholder="123 Smart St, Tech City" oninput="updatePreview('contact')">
+                </div>
+                <div class="row-inputs">
+                    <div class="input-group">
+                        <label for="vcard-phone">Phone Number</label>
+                        <input type="tel" id="vcard-phone" placeholder="+1234567890" oninput="updatePreview('contact')">
+                    </div>
+                    <div class="input-group">
+                        <label for="vcard-email">Email Address</label>
+                        <input type="email" id="vcard-email" placeholder="john@company.com" oninput="updatePreview('contact')">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="vcard-website">Website Link</label>
+                    <input type="url" id="vcard-website" placeholder="https://company.com" oninput="updatePreview('contact')">
+                </div>
+                <button id="btn-write-contact" class="primary-action-btn" onclick="writeContactTag()">⚡ Write Contact Tag</button>
             </div>
-            <div class="input-group">
-                <label for="ice-allergies">Allergies / Medical Notes</label>
-                <textarea id="ice-allergies" placeholder="e.g., Penicillin Allergy, Diabetic..." oninput="updatePreview('emergency')"></textarea>
-            </div>
-            <div class="input-group">
-                <label for="ice-contact">Emergency Contact (Name & Number)</label>
-                <input type="text" id="ice-contact" placeholder="Jane Doe: +1555000999" oninput="updatePreview('emergency')">
-            </div>
-            <button id="btn-write-emergency" class="primary-action-btn" onclick="writeEmergencyTag()">⚡ Write ICE Tag</button>
-        </div>
-    </div>
-
-    <div id="ws-bluetooth" class="workspace">
-        <div class="workspace-header">🔊 Bluetooth Target Connection</div>
-        <div class="suite-card">
-            <div class="input-group">
-                <label for="bt-name">Bluetooth Device Name</label>
-                <input type="text" id="bt-name" placeholder="e.g., Bose QuietComfort" oninput="updatePreview('bluetooth')">
-            </div>
-            <div class="input-group">
-                <label for="bt-mac">MAC Address Physical Code</label>
-                <input type="text" id="bt-mac" placeholder="e.g., 00:11:22:33:FF:EE" oninput="updatePreview('bluetooth')">
-            </div>
-            <button id="btn-write-bluetooth" class="primary-action-btn" onclick="writeBluetoothTag()">⚡ Write Bluetooth Tag</button>
-        </div>
-    </div>
-
-    <div id="ws-wifi" class="workspace">
-        <div class="workspace-header">📶 Secure Guest Wi-Fi Credentials</div>
-        <button id="scanner-trigger" class="scan-trigger-btn" onclick="toggleQrScanner()">📷 Scan Wi-Fi QR Code</button>
-        
-        <div id="scanner-container" class="scanner-container">
-            <div id="qr-reader"></div>
         </div>
 
-        <div class="suite-card">
-            <div class="input-group">
-                <label for="wifi-ssid">Network SSID (Wi-Fi Name)</label>
-                <input type="text" id="wifi-ssid" placeholder="e.g., Home_Network" oninput="updatePreview('wifi')">
+        <!-- 8. PHONE CALL WORKSPACE -->
+        <div id="ws-phone" class="workspace">
+            <div class="workspace-header">📞 Dial Phone Number</div>
+            <div class="suite-card">
+                <div class="input-group">
+                    <label for="phone-number">Target Phone Number</label>
+                    <input type="tel" id="phone-number" placeholder="e.g., +1234567890" oninput="updatePreview('phone')">
+                </div>
+                <button id="btn-write-phone" class="primary-action-btn" onclick="writePhoneTag()">⚡ Write Dialer Tag</button>
             </div>
-
-            <div class="input-group">
-                <label for="wifi-pass">Wi-Fi Password</label>
-                <input type="password" id="wifi-pass" placeholder="Enter security key..." oninput="updatePreview('wifi')">
-            </div>
-
-            <div class="input-group">
-                <label for="wifi-auth">Network Security</label>
-                <select id="wifi-auth" onchange="updatePreview('wifi')">
-                    <option value="WPA">WPA/WPA2 Personal</option>
-                    <option value="WEP">WEP (Legacy)</option>
-                    <option value="NONE">Unsecured / Open</option>
-                </select>
-            </div>
-
-            <button id="wifiActionBtn" class="primary-action-btn" onclick="triggerWifiWrite()">⚡ Write Wi-Fi Tag</button>
         </div>
-    </div>
 
-    <div class="preview-box" id="previewBox">
-        <div class="preview-title">
-            <span>📡 Admin Data Payload:</span>
-            <span id="badgeIndicator" class="admin-badge">Standard Limit</span>
+        <!-- 9. WHATSAPP LINK WORKSPACE -->
+        <div id="ws-whatsapp" class="workspace">
+            <div class="workspace-header">💬 WhatsApp Direct Dispatch</div>
+            <div class="suite-card">
+                <div class="input-group">
+                    <label for="wa-phone">WhatsApp Number (with Country Code)</label>
+                    <input type="tel" id="wa-phone" placeholder="e.g., 923001234567" oninput="updatePreview('whatsapp')">
+                </div>
+                <div class="input-group">
+                    <label for="wa-msg">Optional Pre-filled Text Message</label>
+                    <textarea id="wa-msg" placeholder="e.g., Hi, I am interested in your business..." oninput="updatePreview('whatsapp')"></textarea>
+                </div>
+                <button id="btn-write-whatsapp" class="primary-action-btn" onclick="writeWhatsappTag()">⚡ Write WhatsApp Tag</button>
+            </div>
         </div>
-        <span id="previewDisplay" class="preview-code">Waiting for input configuration...</span>
+
+        <!-- 10. SMS WORKSPACE -->
+        <div id="ws-sms" class="workspace">
+            <div class="workspace-header">✉️ System SMS Dispatch</div>
+            <div class="suite-card">
+                <div class="input-group">
+                    <label for="sms-phone">Recipient Phone Number</label>
+                    <input type="tel" id="sms-phone" placeholder="e.g., +15551234567" oninput="updatePreview('sms')">
+                </div>
+                <div class="input-group">
+                    <label for="sms-body">Preconfigured SMS Body</label>
+                    <textarea id="sms-body" placeholder="Type SMS message contents..." oninput="updatePreview('sms')"></textarea>
+                </div>
+                <button id="btn-write-sms" class="primary-action-btn" onclick="writeSmsTag()">⚡ Write SMS Dispatcher</button>
+            </div>
+        </div>
+
+        <!-- 11. ADDRESS/LOCATION WORKSPACE -->
+        <div id="ws-address" class="workspace">
+            <div class="workspace-header">🗺️ Coordinate Location & Navigation</div>
+            <div class="suite-card">
+                <div class="row-inputs">
+                    <div class="input-group">
+                        <label for="geo-lat">Latitude Coordination</label>
+                        <input type="text" id="geo-lat" placeholder="e.g., 37.7749" oninput="updatePreview('address')">
+                    </div>
+                    <div class="input-group">
+                        <label for="geo-lon">Longitude Coordination</label>
+                        <input type="text" id="geo-lon" placeholder="e.g., -122.4194" oninput="updatePreview('address')">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="geo-dest">Navigation Physical Address (Optional)</label>
+                    <input type="text" id="geo-dest" placeholder="e.g., Times Square, New York" oninput="updatePreview('address')">
+                </div>
+                <button id="btn-write-address" class="primary-action-btn" onclick="writeLocationTag()">⚡ Write Location Tag</button>
+            </div>
+        </div>
+
+        <!-- 12. EMERGENCY INFO WORKSPACE -->
+        <div id="ws-emergency" class="workspace">
+            <div class="workspace-header">🚨 ICE Medical Emergency Info</div>
+            <div class="suite-card">
+                <div class="row-inputs">
+                    <div class="input-group">
+                        <label for="ice-name">Patient Name</label>
+                        <input type="text" id="ice-name" placeholder="John Doe" oninput="updatePreview('emergency')">
+                    </div>
+                    <div class="input-group">
+                        <label for="ice-blood">Blood Group</label>
+                        <input type="text" id="ice-blood" placeholder="O-positive" oninput="updatePreview('emergency')">
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="ice-allergies">Allergies / Medical Notes</label>
+                    <textarea id="ice-allergies" placeholder="e.g., Penicillin Allergy, Diabetic..." oninput="updatePreview('emergency')"></textarea>
+                </div>
+                <div class="input-group">
+                    <label for="ice-contact">Emergency Contact (Name & Number)</label>
+                    <input type="text" id="ice-contact" placeholder="Jane Doe: +1555000999" oninput="updatePreview('emergency')">
+                </div>
+                <button id="btn-write-emergency" class="primary-action-btn" onclick="writeEmergencyTag()">⚡ Write ICE Tag</button>
+            </div>
+        </div>
+
+        <!-- 13. BLUETOOTH MAC CONNECTION WORKSPACE -->
+        <div id="ws-bluetooth" class="workspace">
+            <div class="workspace-header">🔊 Bluetooth Target Connection</div>
+            <div class="suite-card">
+                <div class="input-group">
+                    <label for="bt-name">Bluetooth Device Name</label>
+                    <input type="text" id="bt-name" placeholder="e.g., Bose QuietComfort" oninput="updatePreview('bluetooth')">
+                </div>
+                <div class="input-group">
+                    <label for="bt-mac">MAC Address Physical Code</label>
+                    <input type="text" id="bt-mac" placeholder="e.g., 00:11:22:33:FF:EE" oninput="updatePreview('bluetooth')">
+                </div>
+                <button id="btn-write-bluetooth" class="primary-action-btn" onclick="writeBluetoothTag()">⚡ Write Bluetooth Tag</button>
+            </div>
+        </div>
+
+        <!-- 14. GUEST WIFI WORKSPACE -->
+        <div id="ws-wifi" class="workspace">
+            <div class="workspace-header">📶 Secure Guest Wi-Fi Credentials[cite: 1]</div>
+            <button id="scanner-trigger" class="scan-trigger-btn" onclick="toggleQrScanner()">📷 Scan Wi-Fi QR Code[cite: 1]</button>
+            
+            <div id="scanner-container" class="scanner-container">
+                <div id="qr-reader"></div>
+            </div>
+
+            <div class="suite-card">
+                <div class="input-group">
+                    <label for="wifi-ssid">Network SSID (Wi-Fi Name)[cite: 1]</label>
+                    <input type="text" id="wifi-ssid" placeholder="e.g., Home_Network" oninput="updatePreview('wifi')">[cite: 1]
+                </div>
+
+                <div class="input-group">
+                    <label for="wifi-pass">Wi-Fi Password[cite: 1]</label>
+                    <input type="password" id="wifi-pass" placeholder="Enter security key..." oninput="updatePreview('wifi')">[cite: 1]
+                </div>
+
+                <div class="input-group">
+                    <label for="wifi-auth">Network Security[cite: 1]</label>
+                    <select id="wifi-auth" onchange="updatePreview('wifi')">[cite: 1]
+                        <option value="WPA">WPA/WPA2 Personal</option>[cite: 1]
+                        <option value="WEP">WEP (Legacy)</option>[cite: 1]
+                        <option value="NONE">Unsecured / Open</option>[cite: 1]
+                    </select>
+                </div>
+
+                <button id="wifiActionBtn" class="primary-action-btn" onclick="triggerWifiWrite()">⚡ Write Wi-Fi Tag[cite: 1]</button>
+            </div>
+        </div>
+
+        <!-- Debug View Panel -->
+        <div class="preview-box" id="previewBox">
+            <div class="preview-title">
+                <span>📡 Admin Data Payload:[cite: 1]</span>
+                <span id="badgeIndicator" class="admin-badge">Standard Limit[cite: 1]</span>
+            </div>
+            <span id="previewDisplay" class="preview-code">Waiting for input configuration...[cite: 1]</span>
+        </div>
     </div>
     
+    <!-- System Status Box -->
     <div id="status" style="display:none;"></div>
 </div>
 
@@ -690,11 +794,43 @@
     let clickStreak = 0;
     let lastClick = 0;
     let html5QrcodeScanner = null;
+    let mapsProcessedUrl = '';[cite: 1]
 
     const previewBox = document.getElementById('previewBox');
     const previewDisplay = document.getElementById('previewDisplay');
     const badgeIndicator = document.getElementById('badgeIndicator');
     const statusDiv = document.getElementById('status');
+
+    // ==========================================
+    // 🔐 LOGIN GATEWAY
+    // ==========================================
+    function validateLogin() {
+        const user = document.getElementById('login-user').value.trim();
+        const pass = document.getElementById('login-pass').value.trim();
+
+        if (user === 'razasahu' && pass === 'Zxc@3#1Zx@321$%(@&FS') {
+            isAdmin = true;
+            
+            // Hide login wall and show main interface
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('app-container').style.display = 'block';
+            
+            // Adjust title
+            document.getElementById('app-title').innerText = "NFC Setup Suite";
+            document.getElementById('app-icon').innerText = "🔮";
+            
+            // Apply admin status
+            document.getElementById('sessionUser').innerText = "Admin Access";[cite: 1]
+            badgeIndicator.innerText = "Admin (Unlimited)";[cite: 1]
+            badgeIndicator.classList.add('active');[cite: 1]
+            previewBox.style.display = 'block';[cite: 1]
+            updateUsageDisplay();[cite: 1]
+            
+            showStatus("🎉 Access Granted. System unlocked!", "success");
+        } else {
+            showStatus("❌ Access Denied: Incorrect credentials.", "error");
+        }
+    }
 
     // ==========================================
     // NAVIGATION MANAGER
@@ -724,7 +860,7 @@
 
     function goToMainMenu() {
         activeService = null;
-        stopQrScanner();
+        stopQrScanner();[cite: 1]
 
         // UI Reset
         document.getElementById('main-menu').style.display = 'grid';
@@ -738,79 +874,80 @@
 
     function getServiceIcon(serviceId) {
         const icons = {
-            text: "📝", url: "🔗", search: "🔍", video: "🎬", file: "📂",
-            app: "🚀", contact: "🪪", phone: "📞", whatsapp: "💬",
-            sms: "✉️", address: "🗺️", emergency: "🚨", bluetooth: "🔊", wifi: "📶"
+            maps: "📍", socials: "📱", text: "📝", url: "🔗", search: "🔍", 
+            video: "🎬", file: "📂", app: "🚀", contact: "🪪", phone: "📞", 
+            whatsapp: "💬", sms: "✉️", address: "🗺️", emergency: "🚨", 
+            bluetooth: "🔊", wifi: "📶"
         };
         return icons[serviceId] || "🔮";
     }
 
     // ==========================================
-    // 🕵️‍♂️ SECRET ADMIN AUTHENTICATION
-    // ==========================================
-    function registerBtnClick() {
-        const now = Date.now();
-        clickStreak = (now - lastClick < 1500) ? clickStreak + 1 : 1;
-        lastClick = now;
-
-        if (clickStreak >= 5) {
-            clickStreak = 0;
-            const pass = prompt("Enter Admin Secret Key:");
-            if (pass === 'Zxc@3#1Zx@321$%(@&FS') {
-                isAdmin = true;
-                document.getElementById('sessionUser').innerText = "Admin Access";
-                badgeIndicator.innerText = "Admin (Unlimited)";
-                badgeIndicator.classList.add('active');
-                previewBox.style.display = 'block'; 
-                updateUsageDisplay();
-                showStatus("🎉 Admin authorized! Debug payload viewer is now visible.", "success");
-            } else if (pass !== null) {
-                showStatus("❌ Invalid Admin Password.", "error");
-            }
-        }
-    }
-
-    document.addEventListener('click', (e) => {
-        if (e.target && e.target.classList.contains('primary-action-btn')) {
-            registerBtnClick();
-        }
-    });
-
-    // ==========================================
     // 📊 USAGE RATE LIMITER
     // ==========================================
-    function getTodayString() {
-        const d = new Date();
-        return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
-    }
+    function getTodayString() {[cite: 1]
+        const d = new Date();[cite: 1]
+        return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;[cite: 1]
+    }[cite: 1]
 
-    function getUsage() {
-        return parseInt(localStorage.getItem(`nfc_use_${getTodayString()}`) || '0', 10);
-    }
+    function getUsage() {[cite: 1]
+        return parseInt(localStorage.getItem(`nfc_use_${getTodayString()}`) || '0', 10);[cite: 1]
+    }[cite: 1]
 
-    function incrementUsage() {
-        localStorage.setItem(`nfc_use_${getTodayString()}`, (getUsage() + 1).toString());
-        updateUsageDisplay();
-    }
+    function incrementUsage() {[cite: 1]
+        localStorage.setItem(`nfc_use_${getTodayString()}`, (getUsage() + 1).toString());[cite: 1]
+        updateUsageDisplay();[cite: 1]
+    }[cite: 1]
 
-    function updateUsageDisplay() {
-        const limitEl = document.getElementById('sessionLimit');
-        if (isAdmin) {
-            limitEl.innerHTML = `(<span style="color: var(--success);">Unlimited Writes</span>)`;
-        } else {
-            const count = getUsage();
-            limitEl.innerHTML = `(<span style="color: ${count >= 10 ? 'var(--danger)' : 'var(--primary)'};">${count}/10 Writes Today</span>)`;
-        }
-    }
-    updateUsageDisplay();
+    function updateUsageDisplay() {[cite: 1]
+        const limitEl = document.getElementById('sessionLimit');[cite: 1]
+        if (isAdmin) {[cite: 1]
+            limitEl.innerHTML = `(<span style="color: var(--success);">Unlimited Writes</span>)`;[cite: 1]
+        } else {[cite: 1]
+            const count = getUsage();[cite: 1]
+            limitEl.innerHTML = `(<span style="color: ${count >= 10 ? 'var(--danger)' : 'var(--primary)'};">${count}/10 Writes Today</span>)`;[cite: 1]
+        }[cite: 1]
+    }[cite: 1]
 
     // ==========================================
     // DATA PREVIEW & SCHEMA ENGINE
     // ==========================================
+    const socialMeta = {[cite: 1]
+        youtube: { label: "YouTube Username", placeholder: "e.g., graceautomation", pattern: (u) => `https://www.youtube.com/@${u}?sub_confirmation=1` },[cite: 1]
+        twitter: { label: "X / Twitter Handle", placeholder: "e.g., graceautomation", pattern: (u) => `https://twitter.com/intent/user?screen_name=${u}` },[cite: 1]
+        facebook: { label: "Facebook Profile Name", placeholder: "e.g., graceautomation", pattern: (u) => `https://www.facebook.com/${u}` },[cite: 1]
+        tiktok: { label: "TikTok Username", placeholder: "e.g., graceautomation", pattern: (u) => `https://www.tiktok.com/@${u}` },[cite: 1]
+        instagram: { label: "Instagram Username", placeholder: "e.g., graceautomation", pattern: (u) => `https://www.instagram.com/${u}/` },[cite: 1]
+        linkedin: { label: "LinkedIn Company Slug", placeholder: "e.g., graceautomation", pattern: (u) => `https://www.linkedin.com/company/${u}/` },[cite: 1]
+        twitch: { label: "Twitch Channel", placeholder: "e.g., graceautomation", pattern: (u) => `https://www.twitch.tv/${u}` }[cite: 1]
+    };[cite: 1]
+
+    function handlePlatformChange() {[cite: 1]
+        const platform = document.getElementById('social-platform').value;[cite: 1]
+        const config = socialMeta[platform];[cite: 1]
+        document.getElementById('social-input-label').innerText = config.label;[cite: 1]
+        document.getElementById('social-username').placeholder = config.placeholder;[cite: 1]
+        document.getElementById('social-username').value = "";[cite: 1]
+        updatePreview('socials');
+    }[cite: 1]
+
     function updatePreview(serviceId) {
-        let text = "Waiting for input configuration...";
+        let text = "Waiting for input configuration...";[cite: 1]
         
-        if (serviceId === 'text') {
+        if (serviceId === 'maps') {
+            const rawUrl = document.getElementById('mapsUrl').value.trim();
+            if (rawUrl) {
+                text = rawUrl;
+            } else {
+                text = "[Awaiting Google Maps URL...]";
+            }
+        }
+        else if (serviceId === 'socials') {
+            const platform = document.getElementById('social-platform').value;[cite: 1]
+            const username = document.getElementById('social-username').value.trim();[cite: 1]
+            text = username ? socialMeta[platform].pattern(username) : "Waiting for input configuration...";[cite: 1]
+        }
+        else if (serviceId === 'text') {
             const val = document.getElementById('text-payload').value;
             text = val ? val : "[Plain Text Record]";
         } 
@@ -909,18 +1046,62 @@
             text = mac ? `bt:${mac}${name ? ';' + name : ''}` : "[Bluetooth Target Host Physical MAC Address]";
         }
         else if (serviceId === 'wifi') {
-            const ssid = document.getElementById('wifi-ssid').value.trim();
-            const pass = document.getElementById('wifi-pass').value.trim();
-            const auth = document.getElementById('wifi-auth').value;
-            text = ssid ? `WIFI:S:${ssid};T:${auth};P:${pass};;` : "Waiting for input configuration...";
+            const ssid = document.getElementById('wifi-ssid').value.trim();[cite: 1]
+            const pass = document.getElementById('wifi-pass').value.trim();[cite: 1]
+            const auth = document.getElementById('wifi-auth').value;[cite: 1]
+            text = ssid ? `WIFI:S:${ssid};T:${auth};P:${pass};;` : "Waiting for input configuration...";[cite: 1]
         }
 
-        previewDisplay.innerText = text;
+        previewDisplay.innerText = text;[cite: 1]
     }
 
     // ==========================================
     // INDIVIDUAL SERVICE WRITERS
     // ==========================================
+    async function handleLinkProcess() {
+        const rawUrl = document.getElementById('mapsUrl').value.trim();[cite: 1]
+        if (!rawUrl) {[cite: 1]
+            showStatus("Please paste a Google Maps Link.", "error");[cite: 1]
+            return;[cite: 1]
+        }[cite: 1]
+
+        if (rawUrl.match(/(goo\.gl|g\.page|app\.goo\.gl)/)) {[cite: 1]
+            showStatus("⚠️ Parse Error: Short links not accepted. Follow instruction panel instructions to find the long URL.", "error");[cite: 1]
+            return;[cite: 1]
+        }[cite: 1]
+
+        try {
+            const decodedUrl = decodeURIComponent(rawUrl);[cite: 1]
+            const chijMatch = decodedUrl.match(/(ChIJ[a-zA-Z0-9_-]{23})/);[cite: 1]
+            const hexMatch = decodedUrl.match(/!1s(0x[0-9a-fA-F]+:0x[0-9a-fA-F]+)/);[cite: 1]
+
+            if (chijMatch) {[cite: 1]
+                mapsProcessedUrl = `https://search.google.com/local/writereview?placeid=${chijMatch[1]}`;[cite: 1]
+            } else if (hexMatch) {[cite: 1]
+                mapsProcessedUrl = `https://search.google.com/local/writereview?fid=${hexMatch[1]}`;[cite: 1]
+            } else {[cite: 1]
+                throw new Error("Could not parse Place ID context parameters from this URL.");[cite: 1]
+            }[cite: 1]
+
+            previewDisplay.innerText = mapsProcessedUrl;[cite: 1]
+            await writeNfc({ type: "url", data: mapsProcessedUrl }, 'mapsActionBtn');[cite: 1]
+
+        } catch (e) {
+            showStatus(`❌ ${e.message}`, "error");[cite: 1]
+        }
+    }
+
+    async function triggerSocialWrite() {[cite: 1]
+        const platform = document.getElementById('social-platform').value;[cite: 1]
+        const username = document.getElementById('social-username').value.trim();[cite: 1]
+        if (!username) {[cite: 1]
+            updateButtonFeedback('socialActionBtn', 'error', '⚠️ Input Username First');[cite: 1]
+            return;[cite: 1]
+        }[cite: 1]
+        const socialUrl = socialMeta[platform].pattern(username);[cite: 1]
+        await writeNfc({ type: "url", data: socialUrl }, 'socialActionBtn');[cite: 1]
+    }[cite: 1]
+
     async function writeTextTag() {
         const data = document.getElementById('text-payload').value;
         if (!data) { showStatus("❌ Content is empty.", "error"); return; }
@@ -945,16 +1126,9 @@
         await writeNfc({ type: "url", data }, 'btn-write-video');
     }
 
-    async function writeFileTag() {
-        const data = document.getElementById('file-url').value.trim();
-        if (!data) { showStatus("❌ URL field empty.", "error"); return; }
-        await writeNfc({ type: "url", data }, 'btn-write-file');
-    }
-
     async function writeAppTag() {
         const data = document.getElementById('app-package').value.trim();
         if (!data) { showStatus("❌ Package identifier missing.", "error"); return; }
-        // Attempt custom deep launcher scheme or fallback to standard system URL
         const dataPayload = `android-app://${data}`;
         await writeNfc({ type: "url", data: dataPayload }, 'btn-write-app');
     }
@@ -1002,196 +1176,196 @@
         await writeNfc({ type: "text", data: previewText }, 'btn-write-bluetooth');
     }
 
-    async function triggerWifiWrite() {
-        const ssid = document.getElementById('wifi-ssid').value.trim();
-        const pass = document.getElementById('wifi-pass').value.trim();
-        const auth = document.getElementById('wifi-auth').value;
+    async function triggerWifiWrite() {[cite: 1]
+        const ssid = document.getElementById('wifi-ssid').value.trim();[cite: 1]
+        const pass = document.getElementById('wifi-pass').value.trim();[cite: 1]
+        const auth = document.getElementById('wifi-auth').value;[cite: 1]
 
-        if (!ssid) {
-            updateButtonFeedback('wifiActionBtn', 'error', '⚠️ Input SSID First');
-            return;
-        }
-        const wifiString = `WIFI:S:${ssid};T:${auth};P:${pass};;`;
-        await writeNfc({ type: "text", data: wifiString }, 'wifiActionBtn');
-    }
+        if (!ssid) {[cite: 1]
+            updateButtonFeedback('wifiActionBtn', 'error', '⚠️ Input SSID First');[cite: 1]
+            return;[cite: 1]
+        }[cite: 1]
+        const wifiString = `WIFI:S:${ssid};T:${auth};P:${pass};;`;[cite: 1]
+        await writeNfc({ type: "text", data: wifiString }, 'wifiActionBtn');[cite: 1]
+    }[cite: 1]
 
     // ==========================================
     // 📷 WI-FI QR CODE SCANNER (Original Engine)
     // ==========================================
-    function toggleQrScanner() {
-        const container = document.getElementById('scanner-container');
-        const triggerBtn = document.getElementById('scanner-trigger');
+    function toggleQrScanner() {[cite: 1]
+        const container = document.getElementById('scanner-container');[cite: 1]
+        const triggerBtn = document.getElementById('scanner-trigger');[cite: 1]
 
-        if (container.style.display === 'block') {
-            stopQrScanner();
-        } else {
-            container.style.display = 'block';
-            triggerBtn.innerText = "🛑 Stop Camera Scanner";
-            triggerBtn.style.backgroundColor = "var(--danger)";
-            startQrScanner();
-        }
-    }
+        if (container.style.display === 'block') {[cite: 1]
+            stopQrScanner();[cite: 1]
+        } else {[cite: 1]
+            container.style.display = 'block';[cite: 1]
+            triggerBtn.innerText = "🛑 Stop Camera Scanner";[cite: 1]
+            triggerBtn.style.backgroundColor = "var(--danger)";[cite: 1]
+            startQrScanner();[cite: 1]
+        }[cite: 1]
+    }[cite: 1]
 
-    function startQrScanner() {
-        showStatus("📷 Requesting Camera Access...", "loading");
+    function startQrScanner() {[cite: 1]
+        showStatus("📷 Requesting Camera Access...", "loading");[cite: 1]
         
-        html5QrcodeScanner = new Html5Qrcode("qr-reader");
-        html5QrcodeScanner.start(
-            { facingMode: "environment" }, 
-            {
-                fps: 10,
-                qrbox: { width: 220, height: 220 }
-            },
-            onQrCodeSuccess,
-            onQrCodeError
-        ).then(() => {
-            statusDiv.style.display = 'none';
-        }).catch(err => {
-            showStatus(`❌ Camera initialization failed: ${err}`, "error");
-            stopQrScanner();
-        });
-    }
+        html5QrcodeScanner = new Html5Qrcode("qr-reader");[cite: 1]
+        html5QrcodeScanner.start([cite: 1]
+            { facingMode: "environment" }, [cite: 1]
+            {[cite: 1]
+                fps: 10,[cite: 1]
+                qrbox: { width: 220, height: 220 }[cite: 1]
+            },[cite: 1]
+            onQrCodeSuccess,[cite: 1]
+            onQrCodeError[cite: 1]
+        ).then(() => {[cite: 1]
+            statusDiv.style.display = 'none';[cite: 1]
+        }).catch(err => {[cite: 1]
+            showStatus(`❌ Camera initialization failed: ${err}`, "error");[cite: 1]
+            stopQrScanner();[cite: 1]
+        });[cite: 1]
+    }[cite: 1]
 
-    function stopQrScanner() {
-        const container = document.getElementById('scanner-container');
-        const triggerBtn = document.getElementById('scanner-trigger');
+    function stopQrScanner() {[cite: 1]
+        const container = document.getElementById('scanner-container');[cite: 1]
+        const triggerBtn = document.getElementById('scanner-trigger');[cite: 1]
         
-        if (container) container.style.display = 'none';
-        if (triggerBtn) {
-            triggerBtn.innerText = "📷 Scan Wi-Fi QR Code";
-            triggerBtn.style.backgroundColor = "#4b5563";
-        }
+        if (container) container.style.display = 'none';[cite: 1]
+        if (triggerBtn) {[cite: 1]
+            triggerBtn.innerText = "📷 Scan Wi-Fi QR Code";[cite: 1]
+            triggerBtn.style.backgroundColor = "#4b5563";[cite: 1]
+        }[cite: 1]
 
-        if (html5QrcodeScanner) {
-            html5QrcodeScanner.stop().then(() => {
-                html5QrcodeScanner = null;
-            }).catch(err => console.warn("Error shutting down scanner:", err));
-        }
-    }
+        if (html5QrcodeScanner) {[cite: 1]
+            html5QrcodeScanner.stop().then(() => {[cite: 1]
+                html5QrcodeScanner = null;[cite: 1]
+            }).catch(err => console.warn("Error shutting down scanner:", err));[cite: 1]
+        }[cite: 1]
+    }[cite: 1]
 
-    function onQrCodeSuccess(decodedText) {
-        if (!decodedText.toUpperCase().startsWith("WIFI:")) {
-            showStatus("⚠️ Scanned code is not a valid Wi-Fi configuration format.", "error");
-            return;
-        }
+    function onQrCodeSuccess(decodedText) {[cite: 1]
+        if (!decodedText.toUpperCase().startsWith("WIFI:")) {[cite: 1]
+            showStatus("⚠️ Scanned code is not a valid Wi-Fi configuration format.", "error");[cite: 1]
+            return;[cite: 1]
+        }[cite: 1]
 
-        stopQrScanner();
-        showStatus("✅ QR Code successfully decoded and populated!", "success");
+        stopQrScanner();[cite: 1]
+        showStatus("✅ QR Code successfully decoded and populated!", "success");[cite: 1]
 
-        try {
-            const ssid = parseWifiParam(decodedText, 'S:');
-            const pass = parseWifiParam(decodedText, 'P:');
-            let auth = parseWifiParam(decodedText, 'T:');
+        try {[cite: 1]
+            const ssid = parseWifiParam(decodedText, 'S:');[cite: 1]
+            const pass = parseWifiParam(decodedText, 'P:');[cite: 1]
+            let auth = parseWifiParam(decodedText, 'T:');[cite: 1]
 
-            if (auth === 'WPA2' || auth === 'WPA') auth = 'WPA';
-            if (auth === '') auth = 'NONE';
+            if (auth === 'WPA2' || auth === 'WPA') auth = 'WPA';[cite: 1]
+            if (auth === '') auth = 'NONE';[cite: 1]
 
-            document.getElementById('wifi-ssid').value = ssid;
-            document.getElementById('wifi-pass').value = pass;
-            document.getElementById('wifi-auth').value = auth;
+            document.getElementById('wifi-ssid').value = ssid;[cite: 1]
+            document.getElementById('wifi-pass').value = pass;[cite: 1]
+            document.getElementById('wifi-auth').value = auth;[cite: 1]
 
-            updatePreview('wifi');
-        } catch (e) {
-            showStatus("❌ Failed to parse Wi-Fi data parameters from the QR Code.", "error");
-        }
-    }
+            updatePreview('wifi');[cite: 1]
+        } catch (e) {[cite: 1]
+            showStatus("❌ Failed to parse Wi-Fi data parameters from the QR Code.", "error");[cite: 1]
+        }[cite: 1]
+    }[cite: 1]
 
     function onQrCodeError(errorMessage) {}
 
-    function parseWifiParam(payload, marker) {
-        const index = payload.indexOf(marker);
-        if (index === -1) return '';
+    function parseWifiParam(payload, marker) {[cite: 1]
+        const index = payload.indexOf(marker);[cite: 1]
+        if (index === -1) return '';[cite: 1]
         
-        let sub = payload.substring(index + marker.length);
-        let endIdx = sub.indexOf(';');
+        let sub = payload.substring(index + marker.length);[cite: 1]
+        let endIdx = sub.indexOf(';');[cite: 1]
         
-        while (endIdx !== -1 && sub.charAt(endIdx - 1) === '\\') {
-            endIdx = sub.indexOf(';', endIdx + 1);
-        }
+        while (endIdx !== -1 && sub.charAt(endIdx - 1) === '\\') {[cite: 1]
+            endIdx = sub.indexOf(';', endIdx + 1);[cite: 1]
+        }[cite: 1]
         
-        const rawParam = endIdx !== -1 ? sub.substring(0, endIdx) : sub;
-        return rawParam.replace(/\\;/g, ';').replace(/\\:/g, ':').replace(/\\,/g, ',').replace(/\\\\/g, '\\');
-    }
+        const rawParam = endIdx !== -1 ? sub.substring(0, endIdx) : sub;[cite: 1]
+        return rawParam.replace(/\\;/g, ';').replace(/\\:/g, ':').replace(/\\,/g, ',').replace(/\\\\/g, '\\');[cite: 1]
+    }[cite: 1]
 
     // ==========================================
     // 🎛️ DYNAMIC BUTTON FEEDBACK
     // ==========================================
-    function updateButtonFeedback(buttonId, state, customMsg = "") {
-        const btn = document.getElementById(buttonId);
-        if (!btn) return;
+    function updateButtonFeedback(buttonId, state, customMsg = "") {[cite: 1]
+        const btn = document.getElementById(buttonId);[cite: 1]
+        if (!btn) return;[cite: 1]
 
-        const defaultLabel = btn.getAttribute('data-original-text') || btn.innerText;
-        if (!btn.getAttribute('data-original-text')) {
-            btn.setAttribute('data-original-text', defaultLabel);
-        }
+        const defaultLabel = btn.getAttribute('data-original-text') || btn.innerText;[cite: 1]
+        if (!btn.getAttribute('data-original-text')) {[cite: 1]
+            btn.setAttribute('data-original-text', defaultLabel);[cite: 1]
+        }[cite: 1]
 
-        btn.className = "primary-action-btn";
+        btn.className = "primary-action-btn";[cite: 1]
 
-        if (state === 'loading') {
-            btn.classList.add('btn-loading');
-            btn.innerText = "⌛ Tap NFC Tag Now...";
-            btn.disabled = true;
-        } else if (state === 'success') {
-            btn.classList.add('btn-success');
-            btn.innerText = "🎉 Tag Programmed!";
-            btn.disabled = true;
-            setTimeout(() => { btn.className = "primary-action-btn"; btn.innerText = defaultLabel; btn.disabled = false; }, 3000);
-        } else if (state === 'error') {
-            btn.classList.add('btn-error');
-            btn.innerText = customMsg || "❌ Write Failed";
-            btn.disabled = true;
-            setTimeout(() => { btn.className = "primary-action-btn"; btn.innerText = defaultLabel; btn.disabled = false; }, 3000);
-        }
-    }
+        if (state === 'loading') {[cite: 1]
+            btn.classList.add('btn-loading');[cite: 1]
+            btn.innerText = "⌛ Tap NFC Tag Now...";[cite: 1]
+            btn.disabled = true;[cite: 1]
+        } else if (state === 'success') {[cite: 1]
+            btn.classList.add('btn-success');[cite: 1]
+            btn.innerText = "🎉 Tag Programmed!";[cite: 1]
+            btn.disabled = true;[cite: 1]
+            setTimeout(() => { btn.className = "primary-action-btn"; btn.innerText = defaultLabel; btn.disabled = false; }, 3000);[cite: 1]
+        } else if (state === 'error') {[cite: 1]
+            btn.classList.add('btn-error');[cite: 1]
+            btn.innerText = customMsg || "❌ Write Failed";[cite: 1]
+            btn.disabled = true;[cite: 1]
+            setTimeout(() => { btn.className = "primary-action-btn"; btn.innerText = defaultLabel; btn.disabled = false; }, 3000);[cite: 1]
+        }[cite: 1]
+    }[cite: 1]
 
     // ==========================================
     // ⚡ WEBNFC ENGINE
     // ==========================================
-    async function writeNfc(payload, buttonId) {
-        if (!isAdmin && getUsage() >= 10) {
-            updateButtonFeedback(buttonId, "error", "❌ Limit Exceeded (10/day)");
-            showStatus("❌ RATE LIMIT EXCEEDED: Standard users can write a max of 10 tags per day.", "error");
-            return;
-        }
+    async function writeNfc(payload, buttonId) {[cite: 1]
+        if (!isAdmin && getUsage() >= 10) {[cite: 1]
+            updateButtonFeedback(buttonId, "error", "❌ Limit Exceeded (10/day)");[cite: 1]
+            showStatus("❌ RATE LIMIT EXCEEDED: Standard users can write a max of 10 tags per day.", "error");[cite: 1]
+            return;[cite: 1]
+        }[cite: 1]
 
-        if (!('NDEFReader' in window)) {
-            updateButtonFeedback(buttonId, "error", "❌ Use Chrome on Android");
-            showStatus("❌ NFC programming is only supported using Google Chrome on Android.", "error");
-            return;
-        }
+        if (!('NDEFReader' in window)) {[cite: 1]
+            updateButtonFeedback(buttonId, "error", "❌ Use Chrome on Android");[cite: 1]
+            showStatus("❌ NFC programming is only supported using Google Chrome on Android.", "error");[cite: 1]
+            return;[cite: 1]
+        }[cite: 1]
 
-        try {
-            updateButtonFeedback(buttonId, "loading");
-            showStatus(`⌛ TAP TAG: Hold tag against phone to program...`, "loading");
+        try {[cite: 1]
+            updateButtonFeedback(buttonId, "loading");[cite: 1]
+            showStatus(`⌛ TAP TAG: Hold tag against phone to program...`, "loading");[cite: 1]
 
-            const ndef = new NDEFReader();
+            const ndef = new NDEFReader();[cite: 1]
             
-            let ndefRecord = {};
-            if (payload.type === "url") {
-                ndefRecord = { recordType: "url", data: payload.data };
-            } else if (payload.type === "text") {
-                ndefRecord = { recordType: "text", data: payload.data };
-            }
+            let ndefRecord = {};[cite: 1]
+            if (payload.type === "url") {[cite: 1]
+                ndefRecord = { recordType: "url", data: payload.data };[cite: 1]
+            } else if (payload.type === "text") {[cite: 1]
+                ndefRecord = { recordType: "text", data: payload.data };[cite: 1]
+            }[cite: 1]
 
-            await ndef.write({ records: [ndefRecord] });
+            await ndef.write({ records: [ndefRecord] });[cite: 1]
 
-            if (!isAdmin) incrementUsage();
+            if (!isAdmin) incrementUsage();[cite: 1]
 
-            updateButtonFeedback(buttonId, "success");
-            showStatus("🎉 SUCCESS! Your NFC Tag has been permanently programmed.", "success");
-        } catch (error) {
-            updateButtonFeedback(buttonId, "error", "❌ Write Failed");
-            showStatus(`❌ NFC Write Failed: ${error.message}. Please try again.`, "error");
-        }
-    }
+            updateButtonFeedback(buttonId, "success");[cite: 1]
+            showStatus("🎉 SUCCESS! Your NFC Tag has been permanently programmed.", "success");[cite: 1]
+        } catch (error) {[cite: 1]
+            updateButtonFeedback(buttonId, "error", "❌ Write Failed");[cite: 1]
+            showStatus(`❌ NFC Write Failed: ${error.message}. Please try again.`, "error");[cite: 1]
+        }[cite: 1]
+    }[cite: 1]
 
-    function showStatus(msg, type) {
-        statusDiv.className = '';
-        statusDiv.innerText = msg;
-        if (type === 'loading') statusDiv.classList.add('status-loading');
-        if (type === 'success') statusDiv.classList.add('status-success');
-        if (type === 'error') statusDiv.classList.add('status-error');
-    }
+    function showStatus(msg, type) {[cite: 1]
+        statusDiv.className = '';[cite: 1]
+        statusDiv.innerText = msg;[cite: 1]
+        if (type === 'loading') statusDiv.classList.add('status-loading');[cite: 1]
+        if (type === 'success') statusDiv.classList.add('status-success');[cite: 1]
+        if (type === 'error') statusDiv.classList.add('status-error');[cite: 1]
+    }[cite: 1]
 </script>
 
 </body>
