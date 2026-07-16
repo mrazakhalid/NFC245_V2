@@ -1,43 +1,772 @@
-// ==========================================
-    // 🔐 SECURE LOGIN GATEWAY (SHA-256 HASHED)
-    // ==========================================
-    async function validateLogin() {
-        const user = document.getElementById('login-user').value.trim();
-        const pass = document.getElementById('login-pass').value.trim();
-
-        // Standard SHA-256 hashing function that safely handles special characters
-        async function sha256(string) {
-            const utf8 = new TextEncoder().encode(string);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFC Tag Suite</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg: #f9fafb;
+            --card-bg: #ffffff;
+            --text-main: #111827;
+            --text-muted: #4b5563;
+            --border: #e5e7eb;
+            --warning-bg: #fffbeb;
+            --warning-border: #f59e0b;
+            --warning-text: #b45309;
+            --success: #059669;
+            --success-hover: #047857;
+            --danger: #dc2626;
         }
 
-        const hashedInput = await sha256(pass);
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+        }
 
-        // Matches against the secure SHA-256 hash of "Zxc@3#1Zx@321$%(@&FS"
-        const securePasswordHash = "c9cb8dfd834924ef09ca743da3da30a7d5eaec8f0907d39103bc883ef5089332";
+        .card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+            max-width: 480px;
+            width: 100%;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
 
-        if (user === 'razasahu' && hashedInput === securePasswordHash) {
-            isAdmin = true;
+        .icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin: 0 0 8px 0;
+            color: var(--text-main);
+        }
+
+        .tab-container {
+            display: flex;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-muted);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            text-align: center;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .input-group {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        label {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: all 0.2s;
+            background-color: #fff;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+            outline: none;
+        }
+
+        .instruction-box {
+            background: var(--warning-bg);
+            border: 1px solid var(--warning-border);
+            color: var(--warning-text);
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .instruction-box h4 {
+            margin: 0 0 6px 0;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .instruction-box ol {
+            margin: 0;
+            padding-left: 16px;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        /* Scan Window Box */
+        .scanner-container {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+            background: #000;
+            padding: 10px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        #qr-reader {
+            width: 100%;
+            border: none !important;
+        }
+
+        .scan-trigger-btn {
+            background-color: #4b5563;
+            color: white;
+            border: none;
+            padding: 10px;
+            width: 100%;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .preview-box {
+            background: #f3f4f6;
+            border: 1px dashed #cbd5e1;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 15px;
+            text-align: left;
+            word-break: break-all;
+            display: none;
+        }
+
+        .preview-title {
+            font-size: 10px;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-badge {
+            font-size: 8px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: #e0e7ff;
+            color: #4f46e5;
+            font-weight: bold;
+        }
+
+        .admin-badge.active {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .preview-code {
+            font-family: monospace;
+            font-size: 12px;
+            color: #0f172a;
+            background: #e2e8f0;
+            padding: 6px 10px;
+            border-radius: 6px;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .suite-card {
+            background: #f9fafb;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        .user-status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f3f4f6;
+            padding: 8px 12px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        button.primary-action-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 18px;
+            width: 100%;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        button.primary-action-btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-loading { background-color: #2563eb !important; color: white !important; cursor: not-allowed; }
+        .btn-success { background-color: #059669 !important; color: white !important; }
+        .btn-error { background-color: #dc2626 !important; color: white !important; }
+
+        #status {
+            margin-top: 15px;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 10px;
+            border-radius: 8px;
+            display: none;
+            line-height: 1.4;
+        }
+
+        .status-loading { display: block !important; background: #eff6ff; color: #1e40af; }
+        .status-success { display: block !important; background: #ecfdf5; color: #065f46; }
+        .status-error { display: block !important; background: #fef2f2; color: #991b1b; }
+    </style>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5-qrcode/2.3.8/html5-qrcode.min.js"></script>
+</head>
+<body>
+
+<div class="card">
+    <div id="app-workspace">
+        <div class="icon">🔮</div>
+        <h1>NFC Setup Suite</h1>
+        
+        <div class="user-status-bar">
+            <span>Status: <strong id="sessionUser">Standard Access</strong> <span id="sessionLimit"></span></span>
+        </div>
+
+        <div class="tab-container">
+            <div id="tab-maps" class="tab active" onclick="switchTab('maps')">📍 Maps Link</div>
+            <div id="tab-socials" class="tab" onclick="switchTab('socials')">📱 Social Links</div>
+            <div id="tab-wifi" class="tab" onclick="switchTab('wifi')">📶 Guest Wi-Fi</div>
+        </div>
+        
+        <div id="section-maps">
+            <div class="instruction-box">
+                <h4>🔗 How to get the correct Link:</h4>
+                <ol>
+                    <li>Search your business in Google Maps on your browser or mobile phone.</li>
+                    <li>If on mobile, tap <strong>Share</strong>, then copy the short link and open it in a browser first.</li>
+                    <li>Once loaded completely, copy the <strong>entire, long URL</strong> from the browser's top address bar.</li>
+                    <li>Paste that full URL down below to parse its Place parameters correctly.</li>
+                </ol>
+            </div>
+
+            <div class="input-group">
+                <label for="mapsUrl">Paste Google Maps Link</label>
+                <input type="text" id="mapsUrl" placeholder="Paste full address bar URL here..." autocomplete="off">
+            </div>
+
+            <button id="mapsActionBtn" class="primary-action-btn" onclick="handleLinkProcess()">⚡ Parse & Write Maps Tag</button>
+        </div>
+
+        <div id="section-socials" style="display: none;">
+            <div class="suite-card">
+                <div class="input-group">
+                    <label for="social-platform">Select Social Platform</label>
+                    <select id="social-platform" onchange="handlePlatformChange()">
+                        <option value="youtube">📺 YouTube (Auto-Subscribe)</option>
+                        <option value="twitter">🐦 X / Twitter (Auto-Follow)</option>
+                        <option value="facebook">👥 Facebook Profile/Page</option>
+                        <option value="tiktok">🎵 TikTok Profile</option>
+                        <option value="instagram">📸 Instagram Profile</option>
+                        <option value="linkedin">💼 LinkedIn Company Page</option>
+                        <option value="twitch">🎮 Twitch Channel</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label id="social-input-label" for="social-username">YouTube Username/Channel</label>
+                    <input type="text" id="social-username" placeholder="e.g., graceautomation" oninput="updateSocialPreview()">
+                </div>
+                
+                <button id="socialActionBtn" class="primary-action-btn" onclick="triggerSocialWrite()">⚡ Write Social Tag</button>
+            </div>
+        </div>
+
+        <div id="section-wifi" style="display: none;">
+            <button id="scanner-trigger" class="scan-trigger-btn" onclick="toggleQrScanner()">📷 Scan Wi-Fi QR Code</button>
             
-            // Hide login wall and show main interface
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('app-container').style.display = 'block';
-            
-            // Adjust title
-            document.getElementById('app-title').innerText = "NFC Setup Suite";
-            document.getElementById('app-icon').innerText = "🔮";
-            
-            // Apply admin status
-            document.getElementById('sessionUser').innerText = "Admin Access";
-            badgeIndicator.innerText = "Admin (Unlimited)";
-            badgeIndicator.classList.add('active');
-            previewBox.style.display = 'block';
-            updateUsageDisplay();
-            
-            showStatus("🎉 Access Granted. System unlocked!", "success");
-        } else {
-            showStatus("❌ Access Denied: Incorrect credentials.", "error");
+            <div id="scanner-container" class="scanner-container">
+                <div id="qr-reader"></div>
+            </div>
+
+            <div class="suite-card">
+                <div class="input-group">
+                    <label for="wifi-ssid">Network SSID (Wi-Fi Name)</label>
+                    <input type="text" id="wifi-ssid" placeholder="e.g., Home_Network" oninput="updateWifiPreview()">
+                </div>
+
+                <div class="input-group">
+                    <label for="wifi-pass">Wi-Fi Password</label>
+                    <input type="password" id="wifi-pass" placeholder="Enter security key..." oninput="updateWifiPreview()">
+                </div>
+
+                <div class="input-group">
+                    <label for="wifi-auth">Network Security</label>
+                    <select id="wifi-auth" onchange="updateWifiPreview()">
+                        <option value="WPA">WPA/WPA2 Personal</option>
+                        <option value="WEP">WEP (Legacy)</option>
+                        <option value="NONE">Unsecured / Open</option>
+                    </select>
+                </div>
+
+                <button id="wifiActionBtn" class="primary-action-btn" onclick="triggerWifiWrite()">⚡ Write Wi-Fi Tag</button>
+            </div>
+        </div>
+
+        <div class="preview-box" id="previewBox">
+            <div class="preview-title">
+                <span>📡 Admin Data Payload:</span>
+                <span id="badgeIndicator" class="admin-badge">Standard Limit</span>
+            </div>
+            <span id="previewDisplay" class="preview-code">Waiting for input configuration...</span>
+        </div>
+        
+        <div id="status" style="display:none;"></div>
+    </div>
+</div>
+
+<script>
+    let isAdmin = false; 
+    let activeTab = 'maps';
+    let mapsProcessedUrl = '';
+    
+    let clickStreak = 0;
+    let lastClick = 0;
+
+    let html5QrcodeScanner = null;
+
+    const previewBox = document.getElementById('previewBox');
+    const previewDisplay = document.getElementById('previewDisplay');
+    const badgeIndicator = document.getElementById('badgeIndicator');
+    const statusDiv = document.getElementById('status');
+    const mapsUrlInput = document.getElementById('mapsUrl');
+
+    // ==========================================
+    // 🕵️‍♂️ SECURE ADMIN AUTHENTICATION (SHA-256)
+    // ==========================================
+    async function registerBtnClick() {
+        const now = Date.now();
+        clickStreak = (now - lastClick < 1500) ? clickStreak + 1 : 1;
+        lastClick = now;
+
+        if (clickStreak >= 5) {
+            clickStreak = 0;
+            const pass = prompt("Enter Admin Secret Key:");
+            if (pass !== null && pass.trim() !== "") {
+                
+                // Cryptographic hash builder handling all symbols correctly
+                async function sha256(string) {
+                    const utf8 = new TextEncoder().encode(string);
+                    const hashBuffer = await crypto.subtle.digest('SHA-256', utf8);
+                    const hashArray = Array.from(new Uint8Array(hashBuffer));
+                    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                }
+
+                const hashedInput = await sha256(pass.trim());
+                
+                // Mathematically secures "Zxc@3#1Zx@321$%(@&FS"
+                const securePasswordHash = "c9cb8dfd834924ef09ca743da3da30a7d5eaec8f0907d39103bc883ef5089332";
+
+                if (hashedInput === securePasswordHash) {
+                    isAdmin = true;
+                    document.getElementById('sessionUser').innerText = "Admin Access";
+                    badgeIndicator.innerText = "Admin (Unlimited)";
+                    badgeIndicator.classList.add('active');
+                    previewBox.style.display = 'block'; 
+                    updateUsageDisplay();
+                    showStatus("🎉 Admin authorized! Debug payload viewer is now visible.", "success");
+                } else {
+                    showStatus("❌ Invalid Admin Password.", "error");
+                }
+            }
         }
     }
+
+    document.addEventListener('click', (e) => {
+        if (e.target && e.target.classList.contains('primary-action-btn')) {
+            // Fired as async event catcher
+            registerBtnClick();
+        }
+    });
+
+    // ==========================================
+    // 📊 USAGE RATE LIMITER
+    // ==========================================
+    function getTodayString() {
+        const d = new Date();
+        return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+    }
+
+    function getUsage() {
+        return parseInt(localStorage.getItem(`nfc_use_${getTodayString()}`) || '0', 10);
+    }
+
+    function incrementUsage() {
+        localStorage.setItem(`nfc_use_${getTodayString()}`, (getUsage() + 1).toString());
+        updateUsageDisplay();
+    }
+
+    function updateUsageDisplay() {
+        const limitEl = document.getElementById('sessionLimit');
+        if (isAdmin) {
+            limitEl.innerHTML = `(<span style="color: var(--success);">Unlimited Writes</span>)`;
+        } else {
+            const count = getUsage();
+            limitEl.innerHTML = `(<span style="color: ${count >= 10 ? 'var(--danger)' : 'var(--primary)'};">${count}/10 Writes Today</span>)`;
+        }
+    }
+    updateUsageDisplay();
+
+    // ==========================================
+    // 🔀 TAB CONTROLS & LOAD ON STARTUP
+    // ==========================================
+    function switchTab(tabName) {
+        activeTab = tabName;
+        ['maps', 'socials', 'wifi'].forEach(t => {
+            document.getElementById(`tab-${t}`).classList.toggle('active', t === tabName);
+            document.getElementById(`section-${t}`).style.display = t === tabName ? 'block' : 'none';
+        });
+        statusDiv.style.display = 'none';
+
+        if (tabName !== 'wifi') {
+            stopQrScanner();
+        }
+        
+        if (tabName === 'socials') updateSocialPreview();
+        else if (tabName === 'wifi') updateWifiPreview();
+        else {
+            previewDisplay.innerText = mapsProcessedUrl || "Waiting for input configuration...";
+        }
+    }
+
+    // ==========================================
+    // 📷 WI-FI QR CODE SCANNER ENGINE
+    // ==========================================
+    function toggleQrScanner() {
+        const container = document.getElementById('scanner-container');
+        const triggerBtn = document.getElementById('scanner-trigger');
+
+        if (container.style.display === 'block') {
+            stopQrScanner();
+        } else {
+            container.style.display = 'block';
+            triggerBtn.innerText = "🛑 Stop Camera Scanner";
+            triggerBtn.style.backgroundColor = "var(--danger)";
+            startQrScanner();
+        }
+    }
+
+    function startQrScanner() {
+        showStatus("📷 Requesting Camera Access...", "loading");
+        
+        html5QrcodeScanner = new Html5Qrcode("qr-reader");
+        html5QrcodeScanner.start(
+            { facingMode: "environment" }, 
+            {
+                fps: 10,
+                qrbox: { width: 220, height: 220 }
+            },
+            onQrCodeSuccess,
+            onQrCodeError
+        ).then(() => {
+            statusDiv.style.display = 'none';
+        }).catch(err => {
+            showStatus(`❌ Camera initialization failed: ${err}`, "error");
+            stopQrScanner();
+        });
+    }
+
+    function stopQrScanner() {
+        const container = document.getElementById('scanner-container');
+        const triggerBtn = document.getElementById('scanner-trigger');
+        
+        if (container) container.style.display = 'none';
+        if (triggerBtn) {
+            triggerBtn.innerText = "📷 Scan Wi-Fi QR Code";
+            triggerBtn.style.backgroundColor = "#4b5563";
+        }
+
+        if (html5QrcodeScanner) {
+            html5QrcodeScanner.stop().then(() => {
+                html5QrcodeScanner = null;
+            }).catch(err => console.warn("Error shutting down scanner:", err));
+        }
+    }
+
+    function onQrCodeSuccess(decodedText) {
+        if (!decodedText.toUpperCase().startsWith("WIFI:")) {
+            showStatus("⚠️ Scanned code is not a valid Wi-Fi configuration format.", "error");
+            return;
+        }
+
+        stopQrScanner();
+        showStatus("✅ QR Code successfully decoded and populated!", "success");
+
+        try {
+            const ssid = parseWifiParam(decodedText, 'S:');
+            const pass = parseWifiParam(decodedText, 'P:');
+            let auth = parseWifiParam(decodedText, 'T:');
+
+            if (auth === 'WPA2' || auth === 'WPA');
+            if (auth === 'WPA2' || auth === 'WPA') auth = 'WPA';
+            if (auth === '') auth = 'NONE';
+
+            document.getElementById('wifi-ssid').value = ssid;
+            document.getElementById('wifi-pass').value = pass;
+            document.getElementById('wifi-auth').value = auth;
+
+            updateWifiPreview();
+        } catch (e) {
+            showStatus("❌ Failed to parse Wi-Fi data parameters from the QR Code.", "error");
+        }
+    }
+
+    function onQrCodeError(errorMessage) {}
+
+    function parseWifiParam(payload, marker) {
+        const index = payload.indexOf(marker);
+        if (index === -1) return '';
+        
+        let sub = payload.substring(index + marker.length);
+        let endIdx = sub.indexOf(';');
+        
+        while (endIdx !== -1 && sub.charAt(endIdx - 1) === '\\') {
+            endIdx = sub.indexOf(';', endIdx + 1);
+        }
+        
+        const rawParam = endIdx !== -1 ? sub.substring(0, endIdx) : sub;
+        return rawParam.replace(/\\;/g, ';').replace(/\\:/g, ':').replace(/\\,/g, ',').replace(/\\\\/g, '\\');
+    }
+
+    // ==========================================
+    // 📍 GOOGLE MAPS PARSING
+    // ==========================================
+    async function handleLinkProcess() {
+        const rawUrl = mapsUrlInput.value.trim();
+        if (!rawUrl) {
+            showStatus("Please paste a Google Maps Link.", "error");
+            return;
+        }
+
+        if (rawUrl.match(/(goo\.gl|g\.page|app\.goo\.gl)/)) {
+            showStatus("⚠️ Parse Error: Short links not accepted. Follow instruction panel instructions to find the long URL.", "error");
+            return;
+        }
+
+        try {
+            const decodedUrl = decodeURIComponent(rawUrl);
+            const chijMatch = decodedUrl.match(/(ChIJ[a-zA-Z0-9_-]{23})/);
+            const hexMatch = decodedUrl.match(/!1s(0x[0-9a-fA-F]+:0x[0-9a-fA-F]+)/);
+
+            if (chijMatch) {
+                mapsProcessedUrl = `https://search.google.com/local/writereview?placeid=${chijMatch[1]}`;
+            } else if (hexMatch) {
+                mapsProcessedUrl = `https://search.google.com/local/writereview?fid=${hexMatch[1]}`;
+            } else {
+                throw new Error("Could not parse Place ID context parameters from this URL.");
+            }
+
+            previewDisplay.innerText = mapsProcessedUrl;
+            await writeNfc({ type: "url", data: mapsProcessedUrl }, 'maps');
+
+        } catch (e) {
+            showStatus(`❌ ${e.message}`, "error");
+        }
+    }
+
+    // ==========================================
+    // 📱 SOCIAL CONFIGURATION
+    // ==========================================
+    const socialMeta = {
+        youtube: { label: "YouTube Username", placeholder: "e.g., graceautomation", pattern: (u) => `https://www.youtube.com/@${u}?sub_confirmation=1` },
+        twitter: { label: "X / Twitter Handle", placeholder: "e.g., graceautomation", pattern: (u) => `https://twitter.com/intent/user?screen_name=${u}` },
+        facebook: { label: "Facebook Profile Name", placeholder: "e.g., graceautomation", pattern: (u) => `https://www.facebook.com/${u}` },
+        tiktok: { label: "TikTok Username", placeholder: "e.g., graceautomation", pattern: (u) => `https://www.tiktok.com/@${u}` },
+        instagram: { label: "Instagram Username", placeholder: "e.g., graceautomation", pattern: (u) => `https://www.instagram.com/${u}/` },
+        linkedin: { label: "LinkedIn Company Slug", placeholder: "e.g., graceautomation", pattern: (u) => `https://www.linkedin.com/company/${u}/` },
+        twitch: { label: "Twitch Channel", placeholder: "e.g., graceautomation", pattern: (u) => `https://www.twitch.tv/${u}` }
+    };
+
+    function handlePlatformChange() {
+        const platform = document.getElementById('social-platform').value;
+        const config = socialMeta[platform];
+        document.getElementById('social-input-label').innerText = config.label;
+        document.getElementById('social-username').placeholder = config.placeholder;
+        document.getElementById('social-username').value = "";
+        updateSocialPreview();
+    }
+
+    function updateSocialPreview() {
+        const platform = document.getElementById('social-platform').value;
+        const username = document.getElementById('social-username').value.trim();
+        previewDisplay.innerText = username ? socialMeta[platform].pattern(username) : "Waiting for input configuration...";
+    }
+
+    async function triggerSocialWrite() {
+        const platform = document.getElementById('social-platform').value;
+        const username = document.getElementById('social-username').value.trim();
+        if (!username) {
+            updateButtonFeedback('socials', 'error', '⚠️ Input Username First');
+            return;
+        }
+        const socialUrl = socialMeta[platform].pattern(username);
+        await writeNfc({ type: "url", data: socialUrl }, 'socials');
+    }
+
+    // ==========================================
+    // 📶 WI-FI RECORD GENERATION
+    // ==========================================
+    function generateWifiPayload(ssid, pass, auth) {
+        return `WIFI:S:${ssid};T:${auth};P:${pass};;`;
+    }
+
+    function updateWifiPreview() {
+        const ssid = document.getElementById('wifi-ssid').value.trim();
+        const pass = document.getElementById('wifi-pass').value.trim();
+        const auth = document.getElementById('wifi-auth').value;
+        previewDisplay.innerText = ssid ? generateWifiPayload(ssid, pass, auth) : "Waiting for input configuration...";
+    }
+
+    async function triggerWifiWrite() {
+        const ssid = document.getElementById('wifi-ssid').value.trim();
+        const pass = document.getElementById('wifi-pass').value.trim();
+        const auth = document.getElementById('wifi-auth').value;
+
+        if (!ssid) {
+            updateButtonFeedback('wifi', 'error', '⚠️ Input SSID (Name) First');
+            return;
+        }
+
+        const wifiString = generateWifiPayload(ssid, pass, auth);
+        await writeNfc({ type: "text", data: wifiString }, 'wifi');
+    }
+
+    // ==========================================
+    // 🎛️ DYNAMIC BUTTON FEEDBACK
+    // ==========================================
+    function updateButtonFeedback(targetKey, state, customMsg = "") {
+        const btn = document.getElementById(targetKey === 'maps' ? 'mapsActionBtn' : (targetKey === 'socials' ? 'socialActionBtn' : 'wifiActionBtn'));
+        if (!btn) return;
+
+        const defaultLabel = targetKey === 'maps' ? "⚡ Parse & Write Maps Tag" : (targetKey === 'socials' ? "⚡ Write Social Tag" : "⚡ Write Wi-Fi Tag");
+        btn.className = "primary-action-btn";
+
+        if (state === 'loading') {
+            btn.classList.add('btn-loading');
+            btn.innerText = "⌛ Tap NFC Tag Now...";
+            btn.disabled = true;
+        } else if (state === 'success') {
+            btn.classList.add('btn-success');
+            btn.innerText = "🎉 Tag Programmed!";
+            btn.disabled = true;
+            setTimeout(() => { btn.className = "primary-action-btn"; btn.innerText = defaultLabel; btn.disabled = false; }, 3000);
+        } else if (state === 'error') {
+            btn.classList.add('btn-error');
+            btn.innerText = customMsg || "❌ Write Failed";
+            btn.disabled = true;
+            setTimeout(() => { btn.className = "primary-action-btn"; btn.innerText = defaultLabel; btn.disabled = false; }, 3000);
+        }
+    }
+
+    // ==========================================
+    // ⚡ WEBNFC ENGINE
+    // ==========================================
+    async function writeNfc(payload, source) {
+        if (!isAdmin && getUsage() >= 10) {
+            updateButtonFeedback(source, "error", "❌ Limit Exceeded (10/day)");
+            showStatus("❌ RATE LIMIT EXCEEDED: Standard users can write a max of 10 tags per day.", "error");
+            return;
+        }
+
+        if (!('NDEFReader' in window)) {
+            updateButtonFeedback(source, "error", "❌ Use Chrome on Android");
+            showStatus("❌ NFC programming is only supported using Google Chrome on Android.", "error");
+            return;
+        }
+
+        try {
+            updateButtonFeedback(source, "loading");
+            showStatus(`⌛ TAP TAG: Hold tag against phone to program...`, "loading");
+
+            const ndef = new NDEFReader();
+            
+            let ndefRecord = {};
+            if (payload.type === "url") {
+                ndefRecord = { recordType: "url", data: payload.data };
+            } else if (payload.type === "text") {
+                ndefRecord = { recordType: "text", data: payload.data };
+            }
+
+            await ndef.write({ records: [ndefRecord] });
+
+            if (!isAdmin) incrementUsage();
+
+            updateButtonFeedback(source, "success");
+            showStatus("🎉 SUCCESS! Your NFC Tag has been permanently programmed.", "success");
+        } catch (error) {
+            updateButtonFeedback(source, "error", "❌ Write Failed");
+            showStatus(`❌ NFC Write Failed: ${error.message}. Please try again.`, "error");
+        }
+    }
+
+    function showStatus(msg, type) {
+        statusDiv.className = '';
+        statusDiv.innerText = msg;
+        if (type === 'loading') statusDiv.classList.add('status-loading');
+        if (type === 'success') statusDiv.classList.add('status-success');
+        if (type === 'error') statusDiv.classList.add('status-error');
+    }
+</script>
+
+</body>
+</html>
