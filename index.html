@@ -213,11 +213,17 @@
             </div>
           </div>
 
+          <button class="btn secondary" id="scanWifiBtn">Scan Wi‑Fi QR From Connected Phone</button>
+          <video id="wifiScannerVideo" playsinline muted style="display:none;width:100%;margin-top:14px;border-radius:16px;border:1px solid var(--border);background:#020617;"></video>
+          <button class="btn warn" id="stopWifiScanBtn" style="display:none;">Stop Scanner</button>
+          <label for="wifi-qr-file">Or upload/screenshot a Wi‑Fi QR image</label>
+          <input id="wifi-qr-file" type="file" accept="image/*" />
+
           <button class="btn" id="writeWifiBtn">Write Direct Wi‑Fi NFC Tag</button>
           <button class="btn secondary" id="copyWifiQrBtn">Copy QR/Text Fallback Payload</button>
           <div class="status" id="wifiStatus">Ready.</div>
 
-          <div class="note">Important: Direct Wi‑Fi NFC is mostly an Android feature. iPhone usually detects the NFC tag but does not auto-join Wi‑Fi from this native NFC record. For iPhone, use the copied QR/text payload to make a Wi‑Fi QR code.</div>
+          <div class="note">Important: Direct Wi‑Fi NFC is mostly an Android feature. iPhone usually detects the NFC tag but does not auto-join Wi‑Fi from this native Wi‑Fi NFC record. For scanning, open the Wi‑Fi share QR code on a phone that is already connected, then scan it here to auto-fill SSID and password.</div>
         </section>
 
         <section id="maps" class="section">
